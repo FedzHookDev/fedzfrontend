@@ -22,7 +22,7 @@ export function getPoolId({
         { name: "tickSpacing", type: "int24" },
         { name: "hooks", type: "address" },
       ],
-      [currency0, currency1, fee, tickSpacing, hooks],
+      [currency0 as `0x${string}`, currency1 as `0x${string}`, fee, tickSpacing, hooks as `0x${string}`],
     ),
   );
 }
