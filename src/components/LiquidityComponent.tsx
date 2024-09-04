@@ -9,16 +9,16 @@ import { getPoolId } from '../misc/v4helpers';
 
 const LiquidityComponent = () => {
   const [poolKeyHash, setPoolKeyHash] = useState('');
-  const [token0, setToken0] = useState('');
-  const [token1, setToken1] = useState('');
-  const [amount, setAmount] = useState('');
+  const [token0, setToken0] = useState(MockFUSDAddress);
+  const [token1, setToken1] = useState(MockUSDTAddress);
+  const [amount, setAmount] = useState('1');
   const [tickSpacing, setTickSpacing] = useState(60);
   const [swapFee, setSwapFee] = useState("4000");
-  const [tickLower, setTickLower] = useState(-(BigInt(tickSpacing) * BigInt(10)));
-  const [tickUpper, setTickUpper] = useState((BigInt(tickSpacing) * BigInt(10)))
+  const [tickLower, setTickLower] = useState<Number>(tickSpacing);
+  const [tickUpper, setTickUpper] = useState<Number>(tickSpacing);
 
   const [isApproved, setIsApproved] = useState(false);
-  const [hookData, setHookData] = useState<string>("0000000000000000000000000000000000000000"); // New state for custom hook data
+  const [hookData, setHookData] = useState<`0x${string}`>("0x0"); // New state for custom hook data
   const [swapError, setSwapError] = useState();
 
 
@@ -51,15 +51,24 @@ const LiquidityComponent = () => {
   });
 
   useEffect(() => {
-    if (token0Allowance > amount && token1Allowance > amount) {
-      setIsApproved(true);
+    if (token0Allowance != null && token1Allowance != null && amount != null) {
+      try {
+        const amountBigInt = BigInt(amount);
+        const token0AllowanceBigInt = BigInt(token0Allowance.toString());
+        const token1AllowanceBigInt = BigInt(token1Allowance.toString());
+        
+        const isApproved = token0AllowanceBigInt >= amountBigInt && token1AllowanceBigInt >= amountBigInt;
+        setIsApproved(isApproved);
+      } catch (error) {
+        console.error('Error converting values to BigInt:', error);
+        setIsApproved(false);
+      }
     } else {
       setIsApproved(false);
     }
   }, [token0Allowance, token1Allowance, amount]);
 
   const approveToken0 = async () => {
-
     try {
       await writeApproveToken0Contract({
         address: MockFUSDAddress,
@@ -109,7 +118,7 @@ const LiquidityComponent = () => {
             liquidityDelta: parseEther(amount),
             salt : `0x0000000000000000000000000000000000000000000000000000000000000000`,
           },
-          hookData || "0x00",
+          hookData ,
         ],
       });
       console.log('Swap transaction sent:', result);
@@ -123,7 +132,7 @@ const LiquidityComponent = () => {
   useEffect(() => {
     if (token0 && token1 && swapFee !== undefined && tickSpacing !== undefined && HookAddress) {
       try {
-        const id = getPoolId({currency0: token0,currency1: token1, fee: swapFee, tickSpacing,hooks:  HookAddress});
+        const id = getPoolId({currency0: token0,currency1: token1, fee: Number(swapFee), tickSpacing,hooks:  HookAddress});
         setPoolKeyHash(id);
       } catch (error) {
         console.error('Error calculating pool ID:', error);
@@ -140,13 +149,14 @@ const LiquidityComponent = () => {
   return (
     
     
-    <div className="flex justify-center items-center min-h-screen bg-base-200">
-      <div className="card w-96 bg-base-100 shadow-xl">
+    <div className="flex justify-center items-center min-h-screen ">
+      <div className="card w-96 bg-neutral shadow-xl">
         <div className="card-body">
-          <h2 className="card-title">Add Liquidity</h2>
+          <h2 className="card-title justify-center">Add Liquidity</h2>
           
-          <div className="mb-4">
-            <p className="text-sm">Pool Key Hash: {poolKeyHash}</p>
+          <div className="card  bg-base-300 shadow-xl p-4">
+            <h2 className="card-title text-lg font-bold mb-2 justify-center">Pool Key Hash:</h2>
+            <p className="bg-base-200 p-2 rounded break-all">{poolKeyHash}</p>
           </div>
 
           <div className="form-control w-full max-w-xs mb-4">
@@ -160,7 +170,7 @@ const LiquidityComponent = () => {
             >
               <option disabled defaultValue={"SelectToken"}>Select token</option>
               <option value={MockFUSDAddress}>mFUSD</option>
-              <option value={MockUSDTAddress}>mFUSDT</option>
+              <option value={MockUSDTAddress}>mUSDT</option>
               {/* Add more token options */}
             </select>
           </div>
@@ -194,10 +204,11 @@ const LiquidityComponent = () => {
               onChange={(e) => {
                 const re = /^[0-9]*\.?[0-9]*$/;
                 if (e.target.value === '' || re.test(e.target.value)) {
-                  setTickSpacing((e.target.value));
+                  setTickSpacing(Number(e.target.value));
                 }
               }} 
             />
+             
           </div>
 
           <div className="form-control w-full max-w-xs mb-4">
@@ -212,7 +223,7 @@ const LiquidityComponent = () => {
               onChange={(e) => {
                 const re = /^[0-9]*\.?[0-9]*$/;
                 if (e.target.value === '' || re.test(e.target.value)) {
-                  setSwapFee(Number((e.target.value)));
+                  setSwapFee(((e.target.value)));
                 }
               }} 
             />
@@ -220,42 +231,90 @@ const LiquidityComponent = () => {
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
-              <span className="label-text">Tick Lower </span>
+              <span className="label-text">Tick Lower</span>
             </label>
-            <input 
-              type="text" 
-              placeholder="0.0" 
-              className="input input-bordered w-full max-w-xs" 
-              value={amount}
-              onChange={(e) => {
-                const re = /^[0-9]*\.?[0-9]*$/;
-                if (e.target.value === '' || re.test(e.target.value)) {
-                  setTickLower(BigInt(e.target.value));
-                }
-              }} 
-            />
+            <div className="flex items-center">
+              <button 
+                className="btn btn-square btn-sm"
+                onClick={() => {
+                  const newValue = (tickLower as number) - tickSpacing;
+                  setTickLower(newValue);
+                }}
+              >
+                -
+              </button>
+              <input 
+                type="text" 
+                placeholder="-100" 
+                className="input input-bordered w-full mx-2" 
+                value={tickLower.toString()}
+                onChange={(e) => {
+                  const re = /^[-+]?[0-9]*$/;
+                  if (e.target.value === '' || re.test(e.target.value)) {
+                    setTickLower(e.target.value === '' ? 0 : parseInt(e.target.value, 10));
+                  }
+                }} 
+              />
+              <button 
+                className="btn btn-square btn-sm"
+                onClick={() => {
+                  const newValue = (tickLower as number) + tickSpacing;
+                  setTickLower(newValue);
+                }}
+              >
+                +
+              </button>
+            </div>
+            {(tickLower as number) % tickSpacing !== 0 && (
+              <label className="label">
+                <span className="label-text-alt text-error">Tick Lower must be divisible by {tickSpacing}</span>
+              </label>
+            )}
           </div>
 
 
           <div className="form-control w-full max-w-xs mb-4">
-            <label className="label">
-              <span className="label-text">Tick Upper </span>
-            </label>
-            <input 
-              type="text" 
-              placeholder="0.0" 
-              className="input input-bordered w-full max-w-xs" 
-              value={amount}
-              onChange={(e) => {
-                const re = /^[0-9]*\.?[0-9]*$/;
-                if (e.target.value === '' || re.test(e.target.value)) {
-                  setTickUpper(BigInt(e.target.value));
-                }
-              }} 
-            />
+              <label className="label">
+                <span className="label-text">Tick Upper</span>
+              </label>
+              <div className="flex items-center">
+                <button 
+                  className="btn btn-square btn-sm"
+                  onClick={() => {
+                    const newValue = (tickUpper as number) - tickSpacing;
+                    setTickUpper(newValue);
+                  }}
+                >
+                  -
+                </button>
+                <input 
+                  type="text" 
+                  placeholder="100" 
+                  className="input input-bordered w-full mx-2" 
+                  value={tickUpper.toString()}
+                  onChange={(e) => {
+                    const re = /^[-+]?[0-9]*$/;
+                    if (e.target.value === '' || re.test(e.target.value)) {
+                      setTickUpper(e.target.value === '' ? 0 : parseInt(e.target.value, 10));
+                    }
+                  }} 
+                />
+                <button 
+                  className="btn btn-square btn-sm"
+                  onClick={() => {
+                    const newValue = (tickUpper as number) + tickSpacing;
+                    setTickUpper(newValue);
+                  }}
+                >
+                  +
+                </button>
+              </div>
+              {(tickUpper as number) % tickSpacing !== 0 && (
+                <label className="label">
+                  <span className="label-text-alt text-error">Tick Upper must be divisible by {tickSpacing}</span>
+                </label>
+              )}
           </div>
-
-          
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
@@ -267,7 +326,7 @@ const LiquidityComponent = () => {
               className="input input-bordered w-full max-w-xs" 
               value={amount}
               onChange={(e) => {
-                const re = /^[0-9]*\.?[0-9]*$/;
+                const re = /^[-+]?[0-9]*\.?[0-9]*$/;
                 if (e.target.value === '' || re.test(e.target.value)) {
                   setAmount(e.target.value);
                 }
@@ -275,26 +334,24 @@ const LiquidityComponent = () => {
             />
           </div>
 
-
           <div className="mb-4">
-            <p className="text-sm">Approval Status: {isApproved ? 'Approved' : 'Not Approved'}</p>
+            <p className="bg-base-200 p-2 rounded break-all font-bold">Approval Status: {isApproved ? 'Approved' : 'Not Approved'}</p>
           </div>
 
           <div className="card-actions justify-end">
             {isApproved ? <></> : 
-            <div>
-              <button onClick={approveToken0}>
-                Approve Token0
-              </button>
-              <button onClick={approveToken1}>
-                Approve Token1
-              </button>
-              
-            </div>}
+            <div className="flex justify-between w-full">
+            <button className="btn btn-primary" onClick={approveToken0}>
+              Approve Token 0
+            </button>
+            <button className="btn btn-secondary" onClick={approveToken1}>
+              Approve Token 1
+            </button>
+          </div>}
           </div>
 
-          <div className="card-actions justify-end">
-            {isApproved ? <button className="btn btn-primary" onClick={modifyLiquidity}>Add Liquidity</button> : <div>Approve Tokens First</div>}
+          <div className="card-actions justify-center mt-4">
+            {isApproved && <button className="btn btn-primary btn-wide" onClick={modifyLiquidity}>Modify Liquidity</button>}
           </div>
         </div>
       </div>

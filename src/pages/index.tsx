@@ -2,6 +2,8 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
+import SwapComponent from '../components/SwapComponent';
+
 
 const Home: NextPage = () => {
   return (
@@ -13,6 +15,8 @@ const Home: NextPage = () => {
           name="description"
         />
         <link href="/favicon.ico" rel="icon" />
+        <link href="./output.css" rel="stylesheet" />
+
       </Head>
 
       <main className={styles.main}>
@@ -23,16 +27,16 @@ const Home: NextPage = () => {
           <a href="https://nextjs.org">Next.js!</a>
         </h1>
 
+        <h1 className="text-3xl font-bold underline">
+      Hello world!
+    </h1>
+
         <p className={styles.description}>
           Get started by editing{' '}
           <code className={styles.code}>pages/index.tsx</code>
         </p>
 
         <div className={styles.grid}>
-          <a className={styles.card} href="https://rainbowkit.com">
-            <h2>RainbowKit Documentation &rarr;</h2>
-            <p>Learn how to customize your wallet connection flow.</p>
-          </a>
 
           <a className={styles.card} href="https://wagmi.sh">
             <h2>wagmi Documentation &rarr;</h2>

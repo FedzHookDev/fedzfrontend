@@ -4,7 +4,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const Navbar = () => {
   return (
-    <div className="navbar bg-base-100 fixed top-0 z-50">
+    <div className="navbar bg-base-100 fixed top-0 z-50 mb-10 mb-10 pb-4">
       <div className="flex-1">
         <Link href="/" className="btn btn-ghost normal-case text-xl">
           The Fedz
