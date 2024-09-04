@@ -2,7 +2,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-import SwapComponent from '../components/SwapComponent';
+import Navbar from '../components/Navbar';
 
 
 const Home: NextPage = () => {
@@ -16,24 +16,20 @@ const Home: NextPage = () => {
         />
         <link href="/favicon.ico" rel="icon" />
         <link href="./output.css" rel="stylesheet" />
-
+        
       </Head>
 
       <main className={styles.main}>
-        <ConnectButton />
-
+      <Navbar />
         <h1 className={styles.title}>
-          Welcome to <a href="">RainbowKit</a> + <a href="">wagmi</a> +{' '}
+          Welcome to <a href="">The Fedz</a> + <a href="">wagmi</a> +{' '}
           <a href="https://nextjs.org">Next.js!</a>
         </h1>
 
-        <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+        
 
         <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
+         Shoutout to Mr Brown !
         </p>
 
         <div className={styles.grid}>
