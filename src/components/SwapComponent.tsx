@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAccount, useBalance, useReadContract, useContractWrite, useWriteContract } from 'wagmi';
-import { parseEther, formatEther } from 'viem';
+import { parseEther, formatEther, parseGwei } from 'viem';
 import {PoolSwapTestAddress, HookAddress, MockFUSDAddress, MockUSDTAddress} from "../contractAddress";
 import PoolSwapTestAbi from "../abi/PoolSwapTest_abi.json";
 import MockERC20Abi from "../abi/MockERC20_abi.json";
 import { getPoolId } from '../misc/v4helpers';
+import {formatBigIntToDecimal} from '../misc/formatBigIntToDecimals';
 
 const SwapComponent = () => {
   const [poolKeyHash, setPoolKeyHash] = useState('');
@@ -13,7 +14,11 @@ const SwapComponent = () => {
   const [amount, setAmount] = useState('1');
   const [tickSpacing, setTickSpacing] = useState(60);
   const [swapFee, setSwapFee] = useState(4000);
-  const [isApproved, setIsApproved] = useState(false);
+  const [isToken0Approved, setIsToken0Approved] = useState(false);
+  const [isToken1Approved, setIsToken1Approved] = useState(false);
+  const [MockFUSDBalanceState, setMockFUSDBalanceState] = useState<BigInt>(BigInt(0));
+  const [MockUSDTBalanceState, setMockUSDTBalanceState] = useState<BigInt>(BigInt(0));
+
   const [hookData, setHookData] = useState<`0x${string}`>("0x0"); // New state for custom hook data
   const [swapError, setSwapError] = useState();
 
@@ -47,6 +52,21 @@ const SwapComponent = () => {
     args: [address, PoolSwapTestAddress], 
   });
 
+  const { data: MockFUSDBalance } = useReadContract({
+    address: MockFUSDAddress,
+    abi: MockERC20Abi,
+    functionName: 'balanceOf',
+    args: [address], 
+  });
+
+  const { data: MockUSDTBalance } = useReadContract({
+    address: MockUSDTAddress,
+    abi: MockERC20Abi,
+    functionName: 'balanceOf',
+    args: [address], 
+  });
+
+
   useEffect(() => {
   if (token0Allowance != null && token1Allowance != null && amount != null) {
     try {
@@ -54,16 +74,43 @@ const SwapComponent = () => {
       const token0AllowanceBigInt = BigInt(token0Allowance.toString());
       const token1AllowanceBigInt = BigInt(token1Allowance.toString());
       
-      const isApproved = token0AllowanceBigInt >= amountBigInt && token1AllowanceBigInt >= amountBigInt;
-      setIsApproved(isApproved);
+      const isToken0Approved = token0AllowanceBigInt >= amountBigInt;
+      const isToken1Approved = token1AllowanceBigInt >= amountBigInt;
+      setIsToken0Approved(isToken0Approved);
+      setIsToken1Approved(isToken1Approved);
+      
     } catch (error) {
       console.error('Error converting values to BigInt:', error);
-      setIsApproved(false);
+      setIsToken0Approved(false);
+      setIsToken1Approved(false);
+
     }
   } else {
-    setIsApproved(false);
+    setIsToken0Approved(false);
+    setIsToken1Approved(false);
+
   }
 }, [token0Allowance, token1Allowance, amount]);
+
+useEffect(() => {
+  if (MockFUSDBalance != null && MockUSDTBalance != null) {
+    try {
+      const formattedToken0Balance = (MockFUSDBalance);
+      const formattedToken1Balance = (MockUSDTBalance);
+      
+      setMockFUSDBalanceState(formattedToken0Balance as BigInt);
+      setMockUSDTBalanceState(formattedToken1Balance as BigInt);
+      
+    } catch (error) {
+      console.error('Error formatting balance values:', error);
+      setMockFUSDBalanceState(BigInt(0));
+      setMockUSDTBalanceState(BigInt(0));
+    }
+  } else {
+    setMockFUSDBalanceState(BigInt(0));
+    setMockUSDTBalanceState(BigInt(0));
+  }
+}, [MockFUSDBalance, MockUSDTBalance]);
 
 
 
@@ -148,6 +195,11 @@ const SwapComponent = () => {
     }
   }, [token0, token1, swapFee, tickSpacing, HookAddress]);
   
+
+  const handleMaxClick = () => {
+    if(token0.toLowerCase() === MockFUSDAddress.toLowerCase()) setAmount(MockFUSDBalanceState.toString());
+    if(token0.toLowerCase() === MockUSDTAddress.toLowerCase()) setAmount(MockUSDTBalanceState.toString());
+  };
   
 
   return (
@@ -167,6 +219,9 @@ const SwapComponent = () => {
             <label className="label">
               <span className="label-text">Token 1</span>
             </label>
+            <label className="label">
+              <span className="label-text"> Balance: {formatBigIntToDecimal(MockFUSDBalanceState).toString()}</span>
+            </label>
             <select 
               className="select select-bordered"
               value={token0}
@@ -182,6 +237,9 @@ const SwapComponent = () => {
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
               <span className="label-text">Token 2</span>
+            </label>
+            <label className="label">
+              <span className="label-text"> Balance: {formatBigIntToDecimal(MockUSDTBalanceState).toString()}</span>
             </label>
             <select 
               className="select select-bordered"
@@ -234,42 +292,47 @@ const SwapComponent = () => {
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
-              <span className="label-text">Amount </span>
+              <span className="label-text">Amount</span>
             </label>
-            <input 
-              type="text" 
-              placeholder="0.0" 
-              className="input input-bordered w-full max-w-xs" 
-              value={amount}
-              onChange={(e) => {
-                const re = /^[0-9]*\.?[0-9]*$/;
-                if (e.target.value === '' || re.test(e.target.value)) {
-                  setAmount(e.target.value);
-                }
-              }} 
-            />
+            <div className="flex items-center">
+              <button className="btn btn-square" onClick={handleMaxClick}>Max</button>
+              <input 
+                type="text" 
+                placeholder="0.0" 
+                className="input input-bordered w-full" 
+                value={formatEther(BigInt(Number(amount)))}
+                onChange={(e) => {
+                  const re = /^[0-9]*\.?[0-9]*$/;
+                  if (e.target.value === '' || re.test(e.target.value)) {
+                    setAmount(e.target.value);
+                  }
+                }} 
+              />
+            </div>
           </div>
+
 
 
           <div className="mb-4">
-            <p className="bg-base-200 p-2 rounded break-all font-bold">Approval Status: {isApproved ? 'Approved' : 'Not Approved'}</p>
+            <p className="bg-base-200 p-2 rounded break-all font-bold">Approval Status: {isToken0Approved ? 'Approved for Token 0' : 'Token 0 not Approved'} {isToken1Approved ? 'Approved for Token 1' : 'Token 1 not Approved'}</p>
           </div>
 
           <div className="card-actions justify-end">
-            {isApproved ? <></> : 
+            
             <div className="flex justify-between w-full">
-              <button className="btn btn-primary" onClick={approveToken0}>
+              <button className="btn btn-primary" onClick={approveToken0} disabled={isToken0Approved}>
                 Approve Token 0
               </button>
-              <button className="btn btn-secondary" onClick={approveToken1}>
+              <button className="btn btn-secondary" onClick={approveToken1} disabled={isToken1Approved}>
                 Approve Token 1
               </button>
               
-            </div>}
+            </div>
           </div>
 
           <div className="card-actions justify-center mt-4">
-            {isApproved && <button className="btn btn-primary btn-wide" onClick={swap}>Swap</button>}
+            {(isToken0Approved && !(token0.toLowerCase() < token1.toLowerCase()))  && <button className="btn btn-primary btn-wide" onClick={swap}>Swap </button>}
+            {(isToken1Approved && (token0.toLowerCase() < token1.toLowerCase())) && <button className="btn btn-primary btn-wide" onClick={swap}>Swap </button>}
           </div>
         </div>
       </div>
