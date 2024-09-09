@@ -6,6 +6,8 @@ import PoolSwapTestAbi from "../abi/PoolSwapTest_abi.json";
 import MockERC20Abi from "../abi/MockERC20_abi.json";
 import { getPoolId } from '../misc/v4helpers';
 import {formatBigIntToDecimal} from '../misc/formatBigIntToDecimals';
+import MockERC721Abi from '../abi/MockERC721_abi.json';
+import {MockERC721Address} from '../contractAddress';
 
 const SwapComponent = () => {
   const [poolKeyHash, setPoolKeyHash] = useState('');
@@ -18,6 +20,8 @@ const SwapComponent = () => {
   const [isToken1Approved, setIsToken1Approved] = useState(false);
   const [MockFUSDBalanceState, setMockFUSDBalanceState] = useState<BigInt>(BigInt(0));
   const [MockUSDTBalanceState, setMockUSDTBalanceState] = useState<BigInt>(BigInt(0));
+  const [isNFTHolderState, setIsNFTHolderState] = useState(false);
+
 
   const [hookData, setHookData] = useState<`0x${string}`>("0x0"); // New state for custom hook data
   const [swapError, setSwapError] = useState();
@@ -34,6 +38,19 @@ const SwapComponent = () => {
 
 
   const { address } = useAccount();
+
+  const {data: isNFTHolder} = useReadContract({
+      address: MockERC721Address,
+      abi: MockERC721Abi,
+      functionName: 'isNFTHolder',
+      args: [address],
+  });
+
+  useEffect(() => {
+    if (isNFTHolder !== undefined) {
+      setIsNFTHolderState(isNFTHolder as boolean);
+    }
+  }, [isNFTHolder]);
 
 
   
@@ -217,11 +234,9 @@ useEffect(() => {
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
-              <span className="label-text">Token 1</span>
+              <span className="label-text">Token 1 Balance: {formatBigIntToDecimal(MockFUSDBalanceState).toString()}</span>
             </label>
-            <label className="label">
-              <span className="label-text"> Balance: {formatBigIntToDecimal(MockFUSDBalanceState).toString()}</span>
-            </label>
+            
             <select 
               className="select select-bordered"
               value={token0}
@@ -236,11 +251,9 @@ useEffect(() => {
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
-              <span className="label-text">Token 2</span>
+              <span className="label-text">Token 2 Balance: {formatBigIntToDecimal(MockUSDTBalanceState).toString()}</span>
             </label>
-            <label className="label">
-              <span className="label-text"> Balance: {formatBigIntToDecimal(MockUSDTBalanceState).toString()}</span>
-            </label>
+           
             <select 
               className="select select-bordered"
               value={token1}
@@ -316,9 +329,10 @@ useEffect(() => {
           <div className="mb-4">
             <p className="bg-base-200 p-2 rounded break-all font-bold">Approval Status: {isToken0Approved ? 'Approved for Token 0' : 'Token 0 not Approved'} {isToken1Approved ? 'Approved for Token 1' : 'Token 1 not Approved'}</p>
           </div>
-
+          
+          {isNFTHolderState && (
           <div className="card-actions justify-end">
-            
+          
             <div className="flex justify-between w-full">
               <button className="btn btn-primary" onClick={approveToken0} disabled={isToken0Approved}>
                 Approve Token 0
@@ -328,11 +342,24 @@ useEffect(() => {
               </button>
               
             </div>
-          </div>
+          </div>)}
 
           <div className="card-actions justify-center mt-4">
-            {(isToken0Approved && !(token0.toLowerCase() < token1.toLowerCase()))  && <button className="btn btn-primary btn-wide" onClick={swap}>Swap </button>}
-            {(isToken1Approved && (token0.toLowerCase() < token1.toLowerCase())) && <button className="btn btn-primary btn-wide" onClick={swap}>Swap </button>}
+            {isNFTHolderState ? (
+              <>
+                {(isToken0Approved && !(token0.toLowerCase() < token1.toLowerCase())) && 
+                  <button className="btn btn-primary" onClick={swap}>Swap</button>
+                }
+                {(isToken1Approved && (token0.toLowerCase() < token1.toLowerCase())) && 
+                  <button className="btn btn-primary btn-wide" onClick={swap}>Swap</button>
+                }
+              </>
+            ) : (
+              <div className="alert alert-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <span>You need to be an NFT holder to swap tokens.</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

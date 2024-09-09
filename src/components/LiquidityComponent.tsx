@@ -5,6 +5,8 @@ import {PoolSwapTestAddress, HookAddress, MockFUSDAddress, MockUSDTAddress, Pool
 import MockERC20Abi from "../abi/MockERC20_abi.json";
 import PoolModifiyLiquidityAbi from "../abi/PoolModifyLiquidityTest_abi.json"
 import { getPoolId } from '../misc/v4helpers';
+import MockERC721Abi from '../abi/MockERC721_abi.json';
+import {MockERC721Address} from '../contractAddress';
 
 
 const LiquidityComponent = () => {
@@ -20,6 +22,7 @@ const LiquidityComponent = () => {
   const [isApproved, setIsApproved] = useState(false);
   const [hookData, setHookData] = useState<`0x${string}`>("0x0"); // New state for custom hook data
   const [swapError, setSwapError] = useState();
+  const [isNFTHolderState, setIsNFTHolderState] = useState(false);
 
 
   const MIN_SQRT_PRICE_LIMIT = BigInt("4295128739") + BigInt("1");
@@ -33,6 +36,19 @@ const LiquidityComponent = () => {
 
 
   const { address } = useAccount();
+
+  const {data: isNFTHolder} = useReadContract({
+      address: MockERC721Address,
+      abi: MockERC721Abi,
+      functionName: 'isNFTHolder',
+      args: [address],
+  });
+
+  useEffect(() => {
+    if (isNFTHolder !== undefined) {
+      setIsNFTHolderState(isNFTHolder as boolean);
+    }
+  }, [isNFTHolder]);
 
   
   const { data: token0Allowance } = useReadContract({
@@ -339,19 +355,41 @@ const LiquidityComponent = () => {
           </div>
 
           <div className="card-actions justify-end">
-            {isApproved ? <></> : 
+          {isNFTHolderState ? 
+          (<>
+          {isApproved ? <div className="alert alert-warning">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                          <span>You need to Approve the tokens before providing liquidity.</span>
+                        </div> 
+                        : 
             <div className="flex justify-between w-full">
-            <button className="btn btn-primary" onClick={approveToken0}>
-              Approve Token 0
-            </button>
-            <button className="btn btn-secondary" onClick={approveToken1}>
-              Approve Token 1
-            </button>
-          </div>}
+              <button className="btn btn-primary" onClick={approveToken0}>
+                Approve Token 0
+              </button>
+              <button className="btn btn-secondary" onClick={approveToken1}>
+                Approve Token 1
+              </button>
+            </div>
+          }
+          </>): (
+              <></>
+                )
+          }
+            
           </div>
 
           <div className="card-actions justify-center mt-4">
-            {isApproved && <button className="btn btn-primary btn-wide" onClick={modifyLiquidity}>Modify Liquidity</button>}
+          {isNFTHolderState ? (
+              <>
+                {isApproved && <button className="btn btn-primary btn-wide" onClick={modifyLiquidity}>Modify Liquidity</button>}
+              </>
+            ) : (
+              <div className="alert alert-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <span>You need to be an NFT holder to swap tokens.</span>
+              </div>
+            )}
+            
           </div>
         </div>
       </div>
