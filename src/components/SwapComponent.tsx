@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useAccount, useBalance, useReadContract, useContractWrite, useWriteContract } from 'wagmi';
 import { parseEther, formatEther, parseGwei } from 'viem';
-import {PoolSwapTestAddress, HookAddress, MockFUSDAddress, MockUSDTAddress} from "../contractAddress";
+import {PoolSwapTestAddress, HookAddress, MockFUSDAddress, MockUSDTAddress, TimeSlotSystemAddress} from "../contractAddress";
 import PoolSwapTestAbi from "../abi/PoolSwapTest_abi.json";
 import MockERC20Abi from "../abi/MockERC20_abi.json";
 import { getPoolId } from '../misc/v4helpers';
 import {formatBigIntToDecimal} from '../misc/formatBigIntToDecimals';
 import MockERC721Abi from '../abi/MockERC721_abi.json';
 import {MockERC721Address} from '../contractAddress';
+import TimeSlotSystemAbi from '../abi/TimeSlotSystem_abi.json';
+import PoolKeyHashDisplay from './PoolKeyHash';
 
 const SwapComponent = () => {
   const [poolKeyHash, setPoolKeyHash] = useState('');
@@ -21,6 +23,7 @@ const SwapComponent = () => {
   const [MockFUSDBalanceState, setMockFUSDBalanceState] = useState<BigInt>(BigInt(0));
   const [MockUSDTBalanceState, setMockUSDTBalanceState] = useState<BigInt>(BigInt(0));
   const [isNFTHolderState, setIsNFTHolderState] = useState(false);
+  const [isPlayerTurnState, setIsPlayerTurnState] = useState(false);
 
 
   const [hookData, setHookData] = useState<`0x${string}`>("0x0"); // New state for custom hook data
@@ -46,10 +49,24 @@ const SwapComponent = () => {
       args: [address],
   });
 
+  const {data: isPlayerTurn} = useReadContract({
+    address: TimeSlotSystemAddress,
+    abi: TimeSlotSystemAbi,
+    functionName: 'canPlayerAct',
+    args: [address],
+});
+
+  useEffect(() => {
+    if (isPlayerTurn !== undefined) {
+      setIsPlayerTurnState(isPlayerTurn as boolean);
+    }
+  }, [isPlayerTurn]);
+
   useEffect(() => {
     if (isNFTHolder !== undefined) {
       setIsNFTHolderState(isNFTHolder as boolean);
     }
+    console.log("is address NFT holder", isNFTHolder);
   }, [isNFTHolder]);
 
 
@@ -227,10 +244,7 @@ useEffect(() => {
         <div className="card-body">
           <h2 className="card-title justify-center">Swap Tokens</h2>
           
-          <div className="card  bg-base-300 shadow-xl p-4">
-            <h2 className="card-title text-lg font-bold mb-2 justify-center">Pool Key Hash:</h2>
-            <p className="bg-base-200 p-2 rounded break-all">{poolKeyHash}</p>
-          </div>
+          <PoolKeyHashDisplay poolKeyHash={poolKeyHash} />
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
@@ -334,10 +348,10 @@ useEffect(() => {
           <div className="card-actions justify-end">
           
             <div className="flex justify-between w-full">
-              <button className="btn btn-primary" onClick={approveToken0} disabled={isToken0Approved}>
+              <button className="btn btn-primary" onClick={approveToken0} disabled={isToken0Approved || !isNFTHolderState || !isPlayerTurnState}>
                 Approve Token 0
               </button>
-              <button className="btn btn-secondary" onClick={approveToken1} disabled={isToken1Approved}>
+              <button className="btn btn-secondary" onClick={approveToken1} disabled={isToken1Approved || !isNFTHolderState || !isPlayerTurnState}>
                 Approve Token 1
               </button>
               
@@ -346,14 +360,26 @@ useEffect(() => {
 
           <div className="card-actions justify-center mt-4">
             {isNFTHolderState ? (
-              <>
-                {(isToken0Approved && !(token0.toLowerCase() < token1.toLowerCase())) && 
-                  <button className="btn btn-primary" onClick={swap}>Swap</button>
-                }
-                {(isToken1Approved && (token0.toLowerCase() < token1.toLowerCase())) && 
-                  <button className="btn btn-primary btn-wide" onClick={swap}>Swap</button>
-                }
-              </>
+              
+              <div >
+                {isPlayerTurnState ? (
+                <div className='w-full'>
+                  {(isToken0Approved && !(token0.toLowerCase() < token1.toLowerCase())) && 
+                    <button className="btn btn-primary btn-block" onClick={swap}>Swap</button>
+                  }
+                  {(isToken1Approved && (token0.toLowerCase() < token1.toLowerCase())) && 
+                    <button className="btn btn-primary btn-block" onClick={swap}>Swap</button>
+                  }
+                </div>) : 
+                
+                (<div>
+                  <div className="alert alert-warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    <span>It is not your Turn to Act !</span>
+                  </div>
+                </div>)}
+                
+              </div>
             ) : (
               <div className="alert alert-warning">
                 <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
