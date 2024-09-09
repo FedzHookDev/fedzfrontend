@@ -1,4 +1,4 @@
-import { useAccount, useContractRead } from 'wagmi'
+import { useAccount, useReadContract } from 'wagmi'
 import { useEffect, useState } from 'react'
 import { formatUnits } from 'viem'
 
@@ -10,7 +10,7 @@ export default function ActionWindow() {
   const [startTime, setStartTime] = useState<Date | null>(null)
   const [endTime, setEndTime] = useState<Date | null>(null)
 
-  const { data, isError, isLoading } = useContractRead({
+  const { data, isError, isLoading } = useReadContract({
     address: TimeSlotSystemAddress,
     abi: TimeSlotSystemAbi,
     functionName: 'getNextActionWindow',
