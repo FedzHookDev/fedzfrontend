@@ -263,7 +263,7 @@ useEffect(() => {
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
-              <span className="label-text">Token 1 Balance: {formatBigIntToDecimal(MockFUSDBalanceState).toString()}</span>
+              <span className="label-text">Token 1 Balance: {formatBigIntToDecimal(MockFUSDBalanceState as bigint).toString()}</span>
             </label>
             
             <select 
@@ -280,7 +280,7 @@ useEffect(() => {
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
-              <span className="label-text">Token 2 Balance: {formatBigIntToDecimal(MockUSDTBalanceState).toString()}</span>
+              <span className="label-text">Token 2 Balance: {formatBigIntToDecimal(MockUSDTBalanceState as bigint).toString()}</span>
             </label>
            
             <select 

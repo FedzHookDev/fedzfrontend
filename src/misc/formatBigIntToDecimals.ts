@@ -3,7 +3,7 @@
 
 
 // Format BigInt to decimal with 2 decimal places
-export const formatBigIntToDecimal = (value, decimals = 18, displayDecimals = 6) => {
+export const formatBigIntToDecimal = (value: bigint, decimals = 18, displayDecimals = 6) => {
     if (typeof value !== 'bigint') {
       return 'Invalid Value';
     }
