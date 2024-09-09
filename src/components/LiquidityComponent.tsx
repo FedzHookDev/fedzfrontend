@@ -9,6 +9,8 @@ import MockERC721Abi from '../abi/MockERC721_abi.json';
 import {MockERC721Address} from '../contractAddress';
 import TimeSlotSystemAbi from '../abi/TimeSlotSystem_abi.json';
 import PoolKeyHashDisplay from './PoolKeyHash';
+import TimeSlotSystem from './TimeSlotSystem';
+
 
 
 
@@ -184,12 +186,23 @@ const LiquidityComponent = () => {
   return (
     
     
-    <div className="flex justify-center items-center min-h-screen ">
+    <div className="flex justify-center min-h-screen ">
+      <div className="flex flex-col gap-4 mr-6">
+          <div className="card w-96 bg-base-100 shadow-xl">
+            <div className="card-body">
+              <TimeSlotSystem />
+            </div>
+          </div>
+          <div className="card w-96 bg-base-100 shadow-xl">
+            <div className="card-body">
+              <PoolKeyHashDisplay poolKeyHash={poolKeyHash} />
+            </div>
+          </div>
+        </div>
       <div className="card w-96 bg-neutral shadow-xl">
         <div className="card-body">
           <h2 className="card-title justify-center">Add Liquidity</h2>
           
-          <PoolKeyHashDisplay poolKeyHash={poolKeyHash} />
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
@@ -267,7 +280,7 @@ const LiquidityComponent = () => {
             </label>
             <div className="flex items-center">
               <button 
-                className="btn btn-square btn-sm"
+                className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
                 onClick={() => {
                   const newValue = (tickLower as number) - tickSpacing;
                   setTickLower(newValue);
@@ -288,7 +301,7 @@ const LiquidityComponent = () => {
                 }} 
               />
               <button 
-                className="btn btn-square btn-sm"
+                className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
                 onClick={() => {
                   const newValue = (tickLower as number) + tickSpacing;
                   setTickLower(newValue);
@@ -311,7 +324,7 @@ const LiquidityComponent = () => {
               </label>
               <div className="flex items-center">
                 <button 
-                  className="btn btn-square btn-sm"
+                  className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
                   onClick={() => {
                     const newValue = (tickUpper as number) - tickSpacing;
                     setTickUpper(newValue);
@@ -332,7 +345,7 @@ const LiquidityComponent = () => {
                   }} 
                 />
                 <button 
-                  className="btn btn-square btn-sm"
+                  className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
                   onClick={() => {
                     const newValue = (tickUpper as number) + tickSpacing;
                     setTickUpper(newValue);
@@ -372,16 +385,13 @@ const LiquidityComponent = () => {
 
           <div className="card-actions justify-end">
           
-          {isApproved ? <div className="alert alert-warning">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                          <span>You need to Approve the tokens before providing liquidity.</span>
-                        </div> 
+          {isApproved ? <></>
                         : 
             <div className="flex justify-between w-full">
-              <button className="btn btn-primary" onClick={approveToken0} disabled={!isNFTHolderState || !isPlayerTurnState}>
+              <button className="btn btn-primary hover:scale-110 transition-transform duration-200" onClick={approveToken0} disabled={!isNFTHolderState}>
                 Approve Token 0
               </button>
-              <button className="btn btn-secondary" onClick={approveToken1} disabled={!isNFTHolderState || !isPlayerTurnState}>
+              <button className="btn btn-secondary hover:scale-110 transition-transform duration-200" onClick={approveToken1} disabled={!isNFTHolderState}>
                 Approve Token 1
               </button>
             </div>
@@ -395,12 +405,12 @@ const LiquidityComponent = () => {
             <div>
           {isNFTHolderState ? (
               <>
-                {isApproved && <button className="btn btn-primary btn-wide" onClick={modifyLiquidity}>Modify Liquidity</button>}
+                {isApproved && <button className="btn btn-primary btn-wide hover:scale-110 transition-transform duration-200" onClick={modifyLiquidity}>Modify Liquidity</button>}
               </>
             ) : (
-              <div className="alert alert-warning">
-                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                <span>You need to be an NFT holder to swap tokens.</span>
+              <div className="alert alert-error">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span>It's not your turn to Act !</span>
               </div>
             )}
             

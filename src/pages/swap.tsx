@@ -1,24 +1,29 @@
+'use client';
 import React from 'react';
 import Navbar from '../components/Navbar';
 import SwapComponent from '../components/SwapComponent';
-import TimeSlotSystem from '../components/TimeSlotSystem';
+import { useAccount } from 'wagmi';
 
-const swap = () => {
+const Swap = () => {
+  const { isConnected } = useAccount();
+
   return (
     <div className="min-h-screen bg-base-200">
       <Navbar />
       <main className="container mx-auto px-4 py-8 mt-12">
-        <div className="flex flex-col md:flex-row justify-center items-start gap-8">
-          <div className="w-full md:w-1/2">
-            <TimeSlotSystem />
+        {isConnected ? (
+          <SwapComponent />
+        ) : (
+          <div className="text-center p-8 bg-white rounded-lg shadow-md">
+            <h2 className="text-2xl font-bold mb-4">Wallet Not Connected</h2>
+            <p className="text-gray-600">
+              Please connect your wallet to access the swap feature.
+            </p>
           </div>
-          <div className="w-full md:w-1/2">
-            <SwapComponent />
-          </div>
-        </div>
+        )}
       </main>
     </div>
   );
 };
 
-export default swap;
+export default Swap;
