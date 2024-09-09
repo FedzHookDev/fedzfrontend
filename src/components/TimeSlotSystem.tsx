@@ -7,8 +7,8 @@ import TimeSlotSystemAbi from '../abi/TimeSlotSystem_abi.json'
 
 export default function ActionWindow() {
   const { address, isConnected } = useAccount()
-  const [startTime, setStartTime] = useState(null)
-  const [endTime, setEndTime] = useState(null)
+  const [startTime, setStartTime] = useState<Date | null>(null)
+  const [endTime, setEndTime] = useState<Date | null>(null)
 
   const { data, isError, isLoading } = useContractRead({
     address: TimeSlotSystemAddress,
@@ -19,7 +19,7 @@ export default function ActionWindow() {
 
   useEffect(() => {
     if (data) {
-      const [start, end] = data
+      const [start, end] = data as [bigint, bigint]
       setStartTime(new Date(Number(formatUnits(start, 0)) * 1000))
       setEndTime(new Date(Number(formatUnits(end, 0)) * 1000))
     }
