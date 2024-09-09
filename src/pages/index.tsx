@@ -6,7 +6,12 @@ import Link from 'next/link';
 
 const Home: NextPage = () => {
   return (
-    <div className="min-h-screen bg-gray-100 ">
+    <div className="min-h-screen bg-gray-100 " style={{
+      backgroundImage: "url('/background/background.jpg')",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }}>
       <Head>
         <title>The Fedz Project</title>
         <meta
@@ -108,7 +113,7 @@ const Home: NextPage = () => {
 
       <footer className="footer footer-center p-10 bg-gray-200 text-gray-700 rounded-t-lg mt-8">
         <div>
-          <p>Made with ❤️ by The Fedz Team</p>
+          <p>Made with ❤️ by Loris from The Fedz Team</p>
         </div>
       </footer>
     </div>

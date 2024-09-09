@@ -8,9 +8,14 @@ const Swap = () => {
   const { isConnected } = useAccount();
 
   return (
-    <div className="min-h-screen bg-base-200">
+    <div className="min-h-screen bg-base-200" style={{
+      backgroundImage: "url('/background/background.jpg')",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }}>
       <Navbar />
-      <main className="container mx-auto px-4 py-8 mt-12">
+      <main className="container mx-auto px-4 py-8 mt-20">
         {isConnected ? (
           <SwapComponent />
         ) : (
