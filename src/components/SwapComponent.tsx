@@ -233,8 +233,8 @@ useEffect(() => {
   
 
   const handleMaxClick = () => {
-    if(token0.toLowerCase() === MockFUSDAddress.toLowerCase()) setAmount(MockFUSDBalanceState.toString());
-    if(token0.toLowerCase() === MockUSDTAddress.toLowerCase()) setAmount(MockUSDTBalanceState.toString());
+    if(token0.toLowerCase() === MockFUSDAddress.toLowerCase()) setAmount(formatEther(MockFUSDBalanceState as bigint));
+    if(token0.toLowerCase() === MockUSDTAddress.toLowerCase()) setAmount(formatEther(MockUSDTBalanceState as bigint));
   };
   
 
@@ -342,7 +342,7 @@ useEffect(() => {
                 type="text" 
                 placeholder="0.0" 
                 className="input input-bordered w-full" 
-                value={formatEther(BigInt(Number(amount)))}
+                value={amount}
                 onChange={(e) => {
                   const re = /^[0-9]*\.?[0-9]*$/;
                   if (e.target.value === '' || re.test(e.target.value)) {
@@ -364,10 +364,10 @@ useEffect(() => {
           
             <div className="flex justify-between w-full">
               <button className="btn btn-primary hover:scale-110 transition-transform duration-200" onClick={approveToken0} disabled={isToken0Approved || !isNFTHolderState}>
-                Approve Token 0
+                Approve FUSD
               </button>
               <button className="btn btn-secondary hover:scale-110 transition-transform duration-200" onClick={approveToken1} disabled={isToken1Approved || !isNFTHolderState}>
-                Approve Token 1
+                Approve USDT
               </button>
               
             </div>
