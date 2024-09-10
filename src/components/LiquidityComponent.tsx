@@ -88,16 +88,16 @@ const LiquidityComponent = () => {
   });
 
   useEffect(() => {
-  console.log(token0Allowance.toString());
     if (token0Allowance != null && token1Allowance != null && amount != null) {
       try {
+        
         const amountBigInt = BigInt(amount);
         const token0AllowanceBigInt = BigInt(token0Allowance.toString());
         const token1AllowanceBigInt = BigInt(token1Allowance.toString());
-        
         const isApproved = token0AllowanceBigInt >= amountBigInt && token1AllowanceBigInt >= amountBigInt;
         setIsApproved(isApproved);
       } catch (error) {
+
         console.error('Error converting values to BigInt:', error);
         setIsApproved(false);
       }

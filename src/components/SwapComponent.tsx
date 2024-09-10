@@ -73,7 +73,7 @@ const SwapComponent = () => {
 
 
   
-  const { data: token0Allowance } = useReadContract({
+  const { data: token0Allowance} = useReadContract({
     address: MockFUSDAddress,
     abi: MockERC20Abi,
     functionName: 'allowance',
@@ -109,7 +109,6 @@ const SwapComponent = () => {
       const amountBigInt = BigInt(amount);
       const token0AllowanceBigInt = BigInt(token0Allowance.toString());
       const token1AllowanceBigInt = BigInt(token1Allowance.toString());
-      
       const isToken0Approved = token0AllowanceBigInt >= amountBigInt;
       const isToken1Approved = token1AllowanceBigInt >= amountBigInt;
       setIsToken0Approved(isToken0Approved);
@@ -263,7 +262,7 @@ useEffect(() => {
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
-              <span className="label-text">Token 1 Balance: {formatBigIntToDecimal(MockFUSDBalanceState as bigint).toString()}</span>
+              {token0 == MockFUSDAddress ? <span className="label-text">mFUSD Balance {formatEther(MockFUSDBalanceState as bigint)}</span> : <span className="label-text">mUSDT {formatEther(MockUSDTBalanceState as bigint)}</span>}
             </label>
             
             <select 
@@ -280,7 +279,7 @@ useEffect(() => {
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
-              <span className="label-text">Token 2 Balance: {formatBigIntToDecimal(MockUSDTBalanceState as bigint).toString()}</span>
+              {token0 == MockUSDTAddress ? <span className="label-text">mUSDT {formatEther(MockUSDTBalanceState as bigint)}</span> : <span className="label-text">mFUSD Balance {formatEther(MockFUSDBalanceState as bigint)}</span>}
             </label>
            
             <select 
