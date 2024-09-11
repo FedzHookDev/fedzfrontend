@@ -262,7 +262,7 @@ useEffect(() => {
           </div>
         </div>
 
-      <div className="card w-96 bg-neutral shadow-xl">
+      <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title justify-center">Swap Tokens</h2>
           
@@ -380,7 +380,7 @@ useEffect(() => {
             </select>
           </div>
 
-          <div className="form-control">
+      <div className="form-control">
         <label className="label cursor-pointer">
           <span className="label-text">Pool Settings</span> 
           <input 

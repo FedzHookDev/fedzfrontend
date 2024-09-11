@@ -20,7 +20,7 @@ const LiquidityComponent = () => {
   const [token1, setToken1] = useState(MockUSDTAddress);
   const [amount, setAmount] = useState('1');
   const [tickSpacing, setTickSpacing] = useState(60);
-  const [swapFee, setSwapFee] = useState("4000");
+  const [swapFee, setSwapFee] = useState(4000);
   const [tickLower, setTickLower] = useState<Number>(tickSpacing);
   const [tickUpper, setTickUpper] = useState<Number>(tickSpacing);
 
@@ -29,6 +29,7 @@ const LiquidityComponent = () => {
   const [swapError, setSwapError] = useState();
   const [isNFTHolderState, setIsNFTHolderState] = useState(false);
   const [isPlayerTurnState, setIsPlayerTurnState] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
 
 
@@ -91,7 +92,7 @@ const LiquidityComponent = () => {
     if (token0Allowance != null && token1Allowance != null && amount != null) {
       try {
         
-        const amountBigInt = BigInt(amount);
+        const amountBigInt = parseEther(amount.toString());
         const token0AllowanceBigInt = BigInt(token0Allowance.toString());
         const token1AllowanceBigInt = BigInt(token1Allowance.toString());
         const isApproved = token0AllowanceBigInt >= amountBigInt && token1AllowanceBigInt >= amountBigInt;
@@ -200,7 +201,7 @@ const LiquidityComponent = () => {
             </div>
           </div>
         </div>
-      <div className="card w-96 bg-neutral shadow-xl">
+      <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title justify-center">Add Liquidity</h2>
           
@@ -212,7 +213,10 @@ const LiquidityComponent = () => {
             <select 
               className="select select-bordered"
               value={token0}
-              onChange={(e) => setToken0(e.target.value)}
+              onChange={(e) => {
+                setToken0(e.target.value);
+                setToken1(token0);
+              }}
             >
               <option disabled defaultValue={"SelectToken"}>Select token</option>
               <option value={MockFUSDAddress}>mFUSD</option>
@@ -228,7 +232,10 @@ const LiquidityComponent = () => {
             <select 
               className="select select-bordered"
               value={token1}
-              onChange={(e) => setToken1(e.target.value)}
+              onChange={(e) => {
+                setToken1(e.target.value);
+                setToken0(token1);
+              }}
             >
               <option disabled defaultValue={"SelectToken"}>Select token</option>
               <option value={MockUSDTAddress}>mUSDT</option>
@@ -238,6 +245,20 @@ const LiquidityComponent = () => {
             </select>
           </div>
 
+      <div className="form-control">
+        <label className="label cursor-pointer">
+          <span className="label-text">Pool Settings</span> 
+          <input 
+            type="checkbox" 
+            className="toggle toggle-primary"
+            checked={showSettings}
+            onChange={() => setShowSettings(!showSettings)}
+          />
+        </label>
+      </div>
+
+      {showSettings && (
+        <div className="mt-4">
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
               <span className="label-text">Tick Spacing </span>
@@ -254,7 +275,6 @@ const LiquidityComponent = () => {
                 }
               }} 
             />
-             
           </div>
 
           <div className="form-control w-full max-w-xs mb-4">
@@ -269,11 +289,13 @@ const LiquidityComponent = () => {
               onChange={(e) => {
                 const re = /^[0-9]*\.?[0-9]*$/;
                 if (e.target.value === '' || re.test(e.target.value)) {
-                  setSwapFee(((e.target.value)));
+                  setSwapFee(Number(e.target.value));
                 }
               }} 
             />
           </div>
+        </div>
+      )}
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
@@ -379,10 +401,12 @@ const LiquidityComponent = () => {
               }} 
             />
           </div>
-
+          
+          {/*
           <div className="mb-4">
             <p className="bg-base-200 p-2 rounded break-all font-bold">Approval Status: {isApproved ? 'Approved' : 'Not Approved'}</p>
           </div>
+           */}
 
           <div className="card-actions justify-end">
           

@@ -62,35 +62,50 @@ const NftComponent = () => {
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto">
-      <div className="carousel carousel-vertical w-full">
-        <div className="carousel-item relative w-full">
-        <Image 
-            src={`/NftPictures/nft_${nftIds[currentNft]}.webp`}
-            alt={`NFT ${nftIds[currentNft]}`}
-            width={500}  // Adjust this to your desired width
-            height={500} // Adjust this to your desired height
-            layout="responsive"
-            className="w-full"
-          />
-          <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-            <button onClick={prevNft} className="btn btn-circle">❮</button>
-            <button onClick={nextNft} className="btn btn-circle">❯</button>
-          </div>
+    <div className="flex mt-6 justify-center">
+  <div className="card bg-base-100 shadow-xl h-full">
+    <div className="card-body">
+      <h2 className="card-title justify-center text-center mb-4">Your NFTs</h2>
+      <div className="w-full max-w-xl mx-auto">
+        <div className="carousel carousel-vertical rounded-box h-96">
+          {nftIds.map((nftId, index) => (
+            <div key={nftId} className="carousel-item relative w-full">
+              <Image 
+                src={`/NftPictures/nft_${nftId}.webp`}
+                alt={`NFT ${nftId}`}
+                width={500}  // Adjust this to your desired width
+                height={500} // Adjust this to your desired height
+                layout="responsive"
+                className="w-full"
+              />
+
+            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
+                  <p className="text-xl font-bold text-white">NFT #{nftId}</p>
+                  <p className="text-sm text-gray-300">Legendary Crypto Collectible</p>
+                </div>
+            </div>
+            
+          ))}
         </div>
-      </div>
-      <div className="flex justify-center w-full py-2 gap-2">
-        {nftIds.map((_, index) => (
-          <button 
-            key={index}
-            className={`btn btn-xs ${index === currentNft ? 'btn-active' : ''}`}
-            onClick={() => setCurrentNft(index)}
-          >
-            {index + 1}
-          </button>
-        ))}
+        {/* 
+        <div className="flex justify-center w-full py-2 gap-2 mt-4">
+          {nftIds.map((nftId, index) => (
+            <button 
+              key={nftId}
+              className={`btn btn-xs ${index === currentNft ? 'btn-active' : ''}`}
+              onClick={() => setCurrentNft(index)}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+        */}
       </div>
     </div>
+  </div>
+</div>
+
+
   );
 };
 
