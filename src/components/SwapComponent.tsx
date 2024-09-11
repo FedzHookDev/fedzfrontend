@@ -326,7 +326,7 @@ useEffect(() => {
 
 
           {/* Swap button */}
-          <div className="flex justify-center my-2 relative group">
+          <div className="flex justify-center items-center my-2 relative group">
             <label className="swap swap-rotate cursor-pointer">
               <input type="checkbox" onClick={switchTokens} />
               <svg className="swap-on fill-current w-6 h-6 group-hover:w-8 group-hover:h-8 transition-all duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
