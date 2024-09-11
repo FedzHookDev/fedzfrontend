@@ -26,7 +26,15 @@ const SwapComponent = () => {
   const [MockUSDTBalanceState, setMockUSDTBalanceState] = useState<BigInt>(BigInt(0));
   const [isNFTHolderState, setIsNFTHolderState] = useState(false);
   const [isPlayerTurnState, setIsPlayerTurnState] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
+  // Function to swap tokens
+  const switchTokens = () => {
+    setTimeout(() => {
+      setToken0(token1);
+      setToken1(token0);
+    }, 500); // Adjust this delay to match your rotation animation duration
+  };
 
   const [hookData, setHookData] = useState<`0x${string}`>("0x0"); // New state for custom hook data
   const [swapError, setSwapError] = useState();
@@ -106,7 +114,7 @@ const SwapComponent = () => {
   useEffect(() => {
   if (token0Allowance != null && token1Allowance != null && amount != null) {
     try {
-      const amountBigInt = BigInt(amount);
+      const amountBigInt = parseEther(amount.toString());
       const token0AllowanceBigInt = BigInt(token0Allowance.toString());
       const token1AllowanceBigInt = BigInt(token1Allowance.toString());
       const isToken0Approved = token0AllowanceBigInt >= amountBigInt;
@@ -149,7 +157,7 @@ useEffect(() => {
 
 
 
-  const approveToken0 = async () => {
+  const approveFUSD = async () => {
 
     try {
       await writeApproveToken0Contract({
@@ -163,7 +171,7 @@ useEffect(() => {
   }
   };
 
-  const approveToken1 = async () => {
+  const approveUSDT = async () => {
 
     try {
       await writeApproveToken1Contract({
@@ -261,14 +269,32 @@ useEffect(() => {
           
 
           <div className="form-control w-full max-w-xs mb-4">
-            <label className="label">
-              {token0 == MockFUSDAddress ? <span className="label-text">mFUSD Balance {formatEther(MockFUSDBalanceState as bigint)}</span> : <span className="label-text">mUSDT {formatEther(MockUSDTBalanceState as bigint)}</span>}
-            </label>
+          {token0 == MockFUSDAddress ? (
+              <label className="label flex flex-col items-start">
+                <div className="flex flex-col">
+                  <span className="label-text">Input Token: mFUSD</span>
+                  <span className="label-text text-sm opacity-70">
+                    Balance: {Number(formatEther(MockFUSDBalanceState as bigint)).toFixed(3)}
+                  </span>
+                </div>
+              </label>
+            ) : (
+              <label className="label flex flex-col items-start">
+                <div className="flex flex-col">
+                  <span className="label-text">Input Token: mUSDT</span>
+                  <span className="label-text text-sm opacity-70">
+                    Balance: {Number(formatEther(MockUSDTBalanceState as bigint)).toFixed(3)}
+                  </span>
+                </div>
+              </label>
+            )}
             
             <select 
               className="select select-bordered"
               value={token0}
-              onChange={(e) => setToken0(e.target.value)}
+              onChange={(e) => {setToken0(e.target.value);
+                                setToken1(token0);
+              }}
             >
               <option disabled defaultValue={"SelectToken"}>Select token</option>
               <option value={MockFUSDAddress}>mFUSD</option>
@@ -279,13 +305,72 @@ useEffect(() => {
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
-              {token0 == MockUSDTAddress ? <span className="label-text">mUSDT {formatEther(MockUSDTBalanceState as bigint)}</span> : <span className="label-text">mFUSD Balance {formatEther(MockFUSDBalanceState as bigint)}</span>}
+              <span className="label-text">Amount</span>
             </label>
+            <div className="flex items-center">
+              <button className="btn btn-square mr-1" onClick={handleMaxClick}>Max</button>
+              <input 
+                type="text" 
+                placeholder="0.0" 
+                className="input input-bordered w-full" 
+                value={amount}
+                onChange={(e) => {
+                  const re = /^[0-9]*\.?[0-9]*$/;
+                  if (e.target.value === '' || re.test(e.target.value)) {
+                    setAmount(e.target.value);
+                  }
+                }} 
+              />
+            </div>
+          </div>
+
+
+          {/* Swap button */}
+          <div className="flex justify-center my-2 relative group">
+            <label className="swap swap-rotate cursor-pointer">
+              <input type="checkbox" onClick={switchTokens} />
+              <svg className="swap-on fill-current w-6 h-6 group-hover:w-8 group-hover:h-8 transition-all duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 6v3l4-4l-4-4v3a8 8 0 0 0-8 8c0 1.57.46 3.03 1.24 4.26L6.7 14.8A5.9 5.9 0 0 1 6 12a6 6 0 0 1 6-6m6.76 1.74L17.3 9.2c.44.84.7 1.8.7 2.8a6 6 0 0 1-6 6v-3l-4 4l4 4v-3a8 8 0 0 0 8-8c0-1.57-.46-3.03-1.24-4.26" />
+              </svg>
+              <svg className="swap-off fill-current w-6 h-6 group-hover:w-8 group-hover:h-8 transition-all duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 6v3l4-4l-4-4v3a8 8 0 0 0-8 8c0 1.57.46 3.03 1.24 4.26L6.7 14.8A5.9 5.9 0 0 1 6 12a6 6 0 0 1 6-6m6.76 1.74L17.3 9.2c.44.84.7 1.8.7 2.8a6 6 0 0 1-6 6v-3l-4 4l4 4v-3a8 8 0 0 0 8-8c0-1.57.03-1.24-4.26" />
+              </svg>
+            </label>
+            <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              Swap Tokens
+            </span>
+          </div>
+
+
+
+          <div className="form-control w-full max-w-xs mb-4">
+          {token1 == MockFUSDAddress ? (
+              <label className="label flex flex-col items-start">
+                <div className="flex flex-col">
+                  <span className="label-text">Output Token: mFUSD</span>
+                  <span className="label-text text-sm opacity-70">
+                    Balance: {Number(formatEther(MockFUSDBalanceState as bigint)).toFixed(3)}
+                  </span>
+                </div>
+              </label>
+            ) : (
+              <label className="label flex flex-col items-start">
+                <div className="flex flex-col">
+                  <span className="label-text">Output Token: mUSDT</span>
+                  <span className="label-text text-sm opacity-70">
+                    Balance: {Number(formatEther(MockUSDTBalanceState as bigint)).toFixed(3)}
+                  </span>
+                </div>
+              </label>
+            )}
            
             <select 
               className="select select-bordered"
               value={token1}
-              onChange={(e) => setToken1(e.target.value)}
+              onChange={(e) => {
+                setToken1(e.target.value);
+                setToken0(token1);
+              }}
             >
               <option disabled defaultValue={"SelectToken"}>Select token</option>
               <option value={MockUSDTAddress}>mUSDT</option>
@@ -295,6 +380,20 @@ useEffect(() => {
             </select>
           </div>
 
+          <div className="form-control">
+        <label className="label cursor-pointer">
+          <span className="label-text">Pool Settings</span> 
+          <input 
+            type="checkbox" 
+            className="toggle toggle-primary"
+            checked={showSettings}
+            onChange={() => setShowSettings(!showSettings)}
+          />
+        </label>
+      </div>
+
+      {showSettings && (
+        <div className="mt-4">
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
               <span className="label-text">Tick Spacing </span>
@@ -324,48 +423,32 @@ useEffect(() => {
               value={swapFee}
               onChange={(e) => {
                 const re = /^[0-9]*\.?[0-9]*$/;
-                if (e.target.value === '' || re.test(e.target.value)) {
+                if (e.target.value === '' || re.test(e)) {
                   setSwapFee(Number(e.target.value));
                 }
               }} 
             />
           </div>
+        </div>
+      )}
 
-          <div className="form-control w-full max-w-xs mb-4">
-            <label className="label">
-              <span className="label-text">Amount</span>
-            </label>
-            <div className="flex items-center">
-              <button className="btn btn-square" onClick={handleMaxClick}>Max</button>
-              <input 
-                type="text" 
-                placeholder="0.0" 
-                className="input input-bordered w-full" 
-                value={amount}
-                onChange={(e) => {
-                  const re = /^[0-9]*\.?[0-9]*$/;
-                  if (e.target.value === '' || re.test(e.target.value)) {
-                    setAmount(e.target.value);
-                  }
-                }} 
-              />
-            </div>
-          </div>
+          
 
 
-
+          {/* 
           <div className="mb-4">
             <p className="bg-base-200 p-2 rounded break-all font-bold">Approval Status: {isToken0Approved ? 'Approved for Token 0' : 'Token 0 not Approved'} {isToken1Approved ? 'Approved for Token 1' : 'Token 1 not Approved'}</p>
           </div>
+          */}
           
           {isNFTHolderState && (
           <div className="card-actions justify-end">
           
             <div className="flex justify-between w-full">
-              <button className="btn btn-primary hover:scale-110 transition-transform duration-200" onClick={approveToken0} disabled={isToken0Approved || !isNFTHolderState}>
+              <button className="btn btn-primary hover:scale-110 transition-transform duration-200" onClick={approveFUSD} disabled={isToken0Approved || !isNFTHolderState || token0 != MockFUSDAddress}>
                 Approve FUSD
               </button>
-              <button className="btn btn-secondary hover:scale-110 transition-transform duration-200" onClick={approveToken1} disabled={isToken1Approved || !isNFTHolderState}>
+              <button className="btn btn-secondary hover:scale-110 transition-transform duration-200" onClick={approveUSDT} disabled={isToken1Approved || !isNFTHolderState || token0 != MockUSDTAddress}>
                 Approve USDT
               </button>
               
@@ -401,6 +484,23 @@ useEffect(() => {
               </div>
             )}
           </div>
+
+          <div className="form-control w-full max-w-xs mt-4">
+            <label className="label">
+              <span className="label-text">Output Amount (Estimated) </span>
+            </label>
+            <input 
+              type="text" 
+              placeholder="0.0" 
+              className="input input-bordered w-full max-w-xs" 
+              value={'0'}
+              onChange={(e) => {
+                
+              }} 
+            />
+          </div>
+
+
         </div>
       </div>
     </div>
