@@ -423,7 +423,7 @@ useEffect(() => {
               value={swapFee}
               onChange={(e) => {
                 const re = /^[0-9]*\.?[0-9]*$/;
-                if (e.target.value === '' || re.test(e)) {
+                if (e.target.value === '' || re.test(e.target.value)) {
                   setSwapFee(Number(e.target.value));
                 }
               }} 
