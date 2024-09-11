@@ -16,8 +16,15 @@ function MyApp({ Component, pageProps }: AppProps) {
       <QueryClientProvider client={client}>
         <RainbowKitProvider
         theme={{
-          lightMode: lightTheme(),
-          darkMode: darkTheme(),
+          lightMode: lightTheme({
+            accentColor: '#f3f4f6',
+            accentColorForeground: 'black',
+          }),
+          darkMode: darkTheme({
+            accentColor: '#171717',
+            accentColorForeground: '#f5f5f5',
+
+          }),
         }}
         
         >
