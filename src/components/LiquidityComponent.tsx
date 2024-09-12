@@ -21,7 +21,7 @@ const LiquidityComponent = () => {
   const [amount, setAmount] = useState('1');
   const [tickSpacing, setTickSpacing] = useState(60);
   const [swapFee, setSwapFee] = useState(4000);
-  const [tickLower, setTickLower] = useState<Number>(tickSpacing);
+  const [tickLower, setTickLower] = useState<Number>(-tickSpacing);
   const [tickUpper, setTickUpper] = useState<Number>(tickSpacing);
 
   const [isApproved, setIsApproved] = useState(false);
