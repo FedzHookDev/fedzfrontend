@@ -10,6 +10,8 @@ import {MockERC721Address} from '../contractAddress';
 import TimeSlotSystemAbi from '../abi/TimeSlotSystem_abi.json';
 import PoolKeyHashDisplay from './PoolKeyHash';
 import TimeSlotSystem from './TimeSlotSystem';
+import LiquidityChart from './LiquidityChart';
+
 
 
 
@@ -182,6 +184,16 @@ const LiquidityComponent = () => {
     }
   }, [token0, token1, swapFee, tickSpacing, HookAddress]);
 
+
+  //Tick Change Handler
+  const handleTickChange = (type, newTick) => {
+    if (type === 'lower') {
+      setTickLower(newTick);
+    } else {
+      setTickUpper(newTick);
+    }
+  };
+
   
   
 
@@ -198,6 +210,17 @@ const LiquidityComponent = () => {
           <div className="card w-96 bg-base-100 shadow-xl">
             <div className="card-body">
               <PoolKeyHashDisplay poolKeyHash={poolKeyHash} />
+            </div>
+          </div>
+          <div className="card w-96 bg-base-100 shadow-xl">
+            <div className="card-body">
+            <h2 className="card-title justify-center">Liquidity Chart</h2>
+              <LiquidityChart
+                tickLower={tickLower}
+                tickUpper={tickUpper}
+                tickSpacing={tickSpacing}
+                onTickChange={handleTickChange}
+              />
             </div>
           </div>
         </div>
@@ -296,6 +319,10 @@ const LiquidityComponent = () => {
           </div>
         </div>
       )}
+
+
+
+
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
