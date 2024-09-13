@@ -4,6 +4,8 @@ import * as d3 from 'd3';
 const LiquidityChart = ({ tickLower, tickUpper, tickSpacing, onTickChange }) => {
   const svgRef = useRef();
   const [dimensions, setDimensions] = useState({ width: 800, height: 400 });
+  const [zoomLevel, setZoomLevel] = useState(1);
+
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -20,44 +22,60 @@ const LiquidityChart = ({ tickLower, tickUpper, tickSpacing, onTickChange }) => 
   useEffect(() => {
     if (!dimensions.width) return;
 
-    const svg = d3.select(svgRef.current);
-    svg.selectAll("*").remove();
+  const svg = d3.select(svgRef.current);
+  svg.selectAll("*").remove();
 
-    const margin = { top: 20, right: 20, bottom: 30, left: 20 };
-    const width = dimensions.width - margin.left - margin.right;
-    const height = dimensions.height - margin.top - margin.bottom;
-    const g = svg.append("g")
-  .attr("transform", `translate(${margin.left},${margin.top})`);
+  const margin = { top: 20, right: 20, bottom: 50, left: 20 }; // Increased bottom margin
+  const width = dimensions.width - margin.left - margin.right;
+  const height = dimensions.height - margin.top - margin.bottom;
+  const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
 
+  const minTick = Math.min(tickLower, tickUpper) - tickSpacing * 10;
+  const maxTick = Math.max(tickLower, tickUpper) + tickSpacing * 10;
+  const data = d3.range(minTick, maxTick, tickSpacing).map(tick => ({
+    tick,
+    liquidity: Math.random() * 100
+  }));
 
-    const minTick = Math.min(tickLower, tickUpper) - tickSpacing * 10;
-    const maxTick = Math.max(tickLower, tickUpper) + tickSpacing * 10;
-    const data = d3.range(minTick, maxTick, tickSpacing).map(tick => ({
-      tick,
-      liquidity: Math.random() * 100
-    }));
+  const x = d3.scaleLinear()
+    .domain([minTick, maxTick])
+    .range([0, width]);
 
-    const x = d3.scaleLinear()
-      .domain([minTick, maxTick])
-      .range([0, width]);
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.liquidity)])
+    .range([height, 0]);
 
-    const y = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.liquidity)])
-      .range([height, 0]);
+  const area = d3.area()
+    .x(d => x(d.tick))
+    .y0(height)
+    .y1(d => y(d.liquidity));
 
-    const area = d3.area()
-      .x(d => x(d.tick))
-      .y0(height)
-      .y1(d => y(d.liquidity));
+  g.append("path")
+    .datum(data)
+    .attr("fill", "steelblue")
+    .attr("d", area);
 
-    g.append("path")
-      .datum(data)
-      .attr("fill", "steelblue")
-      .attr("d", area);
+  // Modified x-axis
+  const xAxis = d3.axisBottom(x)
+  .tickFormat(d => d.toFixed(0))
+  .tickValues(d3.range(minTick, maxTick, tickSpacing * 5)); // Display fewer ticks
 
-    g.append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(x).tickFormat(d => d.toFixed(0)));
+  g.append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(xAxis)
+    .selectAll("text")
+    .attr("y", 10)
+    .attr("x", 9)
+    .attr("dy", ".35em")
+    .attr("transform", "rotate(45)")
+    .style("text-anchor", "start");
+
+  // Add x-axis label
+  g.append("text")
+    .attr("transform", `translate(${width/2},${height + margin.bottom - 10})`)
+    .style("text-anchor", "middle")
+    .text("Tick");
 
 
     const drawTickSelector = (initialTick, color, type) => {
