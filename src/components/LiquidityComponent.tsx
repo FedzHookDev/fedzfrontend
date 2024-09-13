@@ -215,11 +215,7 @@ const LiquidityComponent = () => {
               <TimeSlotSystem />
             </div>
           </div>
-          <div className="card w-96 bg-base-100 shadow-xl">
-            <div className="card-body">
-              <PoolKeyHashDisplay poolKeyHash={poolKeyHash} />
-            </div>
-          </div>
+          
           <div className="card w-96 bg-base-100 shadow-xl">
             <div className="card-body">
             <h2 className="card-title justify-center">Liquidity Chart</h2>
@@ -330,7 +326,13 @@ const LiquidityComponent = () => {
           )}
             </div>
           </div>
+          <div className="card w-96 bg-base-100 shadow-xl">
+            <div className="card-body">
+              <PoolKeyHashDisplay poolKeyHash={poolKeyHash} />
+            </div>
+          </div>
         </div>
+      
       <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title justify-center">Add Liquidity</h2>
