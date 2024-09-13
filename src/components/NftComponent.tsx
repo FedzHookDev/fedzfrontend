@@ -1,111 +1,99 @@
 import React, { useState, useEffect } from 'react';
-import { useAccount, usePublicClient, useReadContract } from 'wagmi';
-import { parseAbi } from 'viem';
+import { useAccount, useReadContracts } from 'wagmi';
 import { MockERC721Address } from '../contractAddress';
 import MockERC721Abi from '../abi/MockERC721_abi.json';
 import Image from 'next/image';
+import { Abi } from 'viem';
+
+
+type Address = `0x${string}`;
+
 
 const NftComponent = () => {
-  const [nftIds, setNftIds] = useState<number[]>([]);
-  const [currentNft, setCurrentNft] = useState(0);
+  const [allNfts, setAllNfts] = useState<{owner: string, id: number}[]>([]);
   const { address } = useAccount();
-  const publicClient = usePublicClient();
 
-  const { data: balance} = useReadContract({
-    address: MockERC721Address,
-    abi: MockERC721Abi,
-    functionName: 'balanceOf',
-    args: [address],
+  const { data: ownersResult  } = useReadContracts({
+    contracts: [
+      {
+        address: MockERC721Address as `0x${string}`,
+        abi: MockERC721Abi as Abi,
+        functionName: 'getAllOwners',
+      }
+    ]
+  });
+
+  const owners = ownersResult?.[0].result as Address[] | undefined;
+
+
+  const { data: ownedTokensResult } = useReadContracts({
+    contracts: owners?.map(owner => ({
+      address: MockERC721Address as `0x${string}`,
+      abi: MockERC721Abi as Abi,
+      functionName: 'getOwnedTokenIds',
+      args: [owner] as const,
+    })) ?? [],
   });
 
   useEffect(() => {
-    const fetchNftIds = async () => {
-      if (balance) {
-        const BalanceNumber = parseInt(balance.toString());
-        const ids = [];
-        for (let i = 0; i < BalanceNumber; i++) {
-            /*
-          const id = await publicClient.readContract({
-            address: MockERC721Address,
-            abi: MockERC721Abi,
-            functionName: 'tokenOfOwnerByIndex',
-            args: [address, i],
-          });
-            */
-            const id = i + 1;
-            ids.push(id);
-        }
-        setNftIds(ids);
-      }
-    };
-    fetchNftIds();
-  }, [balance, address, publicClient]);
-
-  const nextNft = () => {
-    setCurrentNft((prev) => (prev + 1) % nftIds.length);
-  };
-
-  const prevNft = () => {
-    setCurrentNft((prev) => (prev - 1 + nftIds.length) % nftIds.length);
-  };
+    if (owners && ownedTokensResult) {
+      const nfts = owners.flatMap((owner, index) => 
+        (ownedTokensResult[index].result as bigint[] | undefined)?.map(id => ({ owner, id: Number(id) })) ?? []
+      );
+      
+      // Sort NFTs to put connected user's NFTs first
+      nfts.sort((a, b) => {
+        if (a.owner === address) return -1;
+        if (b.owner === address) return 1;
+        return 0;
+      });
+      
+      setAllNfts(nfts);
+    }
+  }, [owners, ownedTokensResult, address]);
 
   if (!address) {
     return <div>Please connect your wallet</div>;
   }
 
-  if (balance === undefined) {
-    return <div>Loading...</div>;
-  }
-
-  if (balance === 0) {
-    return <div>You don't have any NFTs from this collection</div>;
+  if (!owners || !ownedTokensResult) {
+    return<div>Loading ...</div>;
   }
 
   return (
     <div className="flex mt-6 justify-center">
-  <div className="card bg-base-100 shadow-xl h-full">
-    <div className="card-body">
-      <h2 className="card-title justify-center text-center mb-4">Your NFTs</h2>
-      <div className="w-full max-w-xl mx-auto">
-        <div className="carousel carousel-vertical rounded-box h-96">
-          {nftIds.map((nftId, index) => (
-            <div key={nftId} className="carousel-item relative w-full">
-              <Image 
-                src={`/NftPictures/nft_${nftId}.webp`}
-                alt={`NFT ${nftId}`}
-                width={500}  // Adjust this to your desired width
-                height={500} // Adjust this to your desired height
-                layout="responsive"
-                className="w-full"
-              />
-
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
-                  <p className="text-xl font-bold text-white">NFT #{nftId}</p>
-                  <p className="text-sm text-gray-300">Legendary Crypto Collectible</p>
+      <div className="card bg-base-100 shadow-xl h-full">
+        <div className="card-body">
+          <h2 className="card-title justify-center text-center mb-4">All NFTs</h2>
+          <div className="w-full max-w-xl mx-auto">
+            <div className="carousel carousel-vertical rounded-box h-96">
+              {allNfts.map(({ owner, id }) => (
+                <div key={`${owner}-${id}`} className="carousel-item relative w-full h-96">
+                  <Image 
+                    src={`/NftPictures/nft_${id}.webp`}
+                    alt={`NFT ${id}`}
+                    width={500}
+                    height={500}
+                    layout="responsive"
+                    className={`w-full ${owner === address ? 'border-4 border-yellow-400' : ''}`}
+                    style={{
+                      objectFit: "cover",
+                      borderRadius: "25px", //👈 and here you can select border radius
+                    }}
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
+                    <p className="text-xl font-bold text-white">NFT #{id}</p>
+                    <p className="text-sm text-gray-300">
+                      Owner: {owner === address ? 'You' : `${owner.slice(0, 6)}...${owner.slice(-4)}`}
+                    </p>
+                  </div>
                 </div>
+              ))}
             </div>
-            
-          ))}
+          </div>
         </div>
-        {/* 
-        <div className="flex justify-center w-full py-2 gap-2 mt-4">
-          {nftIds.map((nftId, index) => (
-            <button 
-              key={nftId}
-              className={`btn btn-xs ${index === currentNft ? 'btn-active' : ''}`}
-              onClick={() => setCurrentNft(index)}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
-        */}
       </div>
     </div>
-  </div>
-</div>
-
-
   );
 };
 

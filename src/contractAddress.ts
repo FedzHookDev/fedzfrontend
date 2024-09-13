@@ -6,4 +6,4 @@ export const HookAddress = 	'0x4E4a9A0C097427A4A72B1386A031fd411adf8aC0';
 export const MockUSDTAddress ='0x0f1D1b7abAeC1Df25f2C4Db751686FC5233f6D3f';
 export const MockFUSDAddress = '0xc7c06a77b481869ecc57E5432D03c3661406424D';
 export const TimeSlotSystemAddress = '0xa84a71df24F8D35aD3e3773123c23aea283F2111';
-export const MockERC721Address = '0xEaa84c44aaA4901faac9A855467ba2297b7a4046';
+export const MockERC721Address = '0xbF8256444BbaEE2397bf2e16E9153B1b6e1F3c9E';
