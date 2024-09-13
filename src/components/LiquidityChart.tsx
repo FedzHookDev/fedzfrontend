@@ -71,11 +71,7 @@ const LiquidityChart = ({ tickLower, tickUpper, tickSpacing, onTickChange }) => 
     .attr("transform", "rotate(45)")
     .style("text-anchor", "start");
 
-  // Add x-axis label
-  g.append("text")
-    .attr("transform", `translate(${width/2},${height + margin.bottom - 10})`)
-    .style("text-anchor", "middle")
-    .text("Tick");
+  
 
 
     const drawTickSelector = (initialTick, color, type) => {

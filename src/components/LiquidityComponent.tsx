@@ -28,10 +28,10 @@ const LiquidityComponent = () => {
 
   const [isApproved, setIsApproved] = useState(false);
   const [hookData, setHookData] = useState<`0x${string}`>("0x0"); // New state for custom hook data
-  const [swapError, setSwapError] = useState();
   const [isNFTHolderState, setIsNFTHolderState] = useState(false);
   const [isPlayerTurnState, setIsPlayerTurnState] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [tickError, setTickError] = useState<string | null>(null);
 
 
 
@@ -59,6 +59,14 @@ const LiquidityComponent = () => {
       setIsNFTHolderState(isNFTHolder as boolean);
     }
   }, [isNFTHolder]);
+
+  useEffect(() => {
+    if (tickLower > tickUpper) {
+      setTickError("Lower tick cannot be above upper tick!");
+    } else {
+      setTickError(null);
+    }
+  }, [tickLower, tickUpper]);
 
 
   const {data: isPlayerTurn} = useReadContract({
@@ -215,12 +223,111 @@ const LiquidityComponent = () => {
           <div className="card w-96 bg-base-100 shadow-xl">
             <div className="card-body">
             <h2 className="card-title justify-center">Liquidity Chart</h2>
+            <div className="form-control w-full max-w-xs mb-1">
+            <label className="label">
+              <span className="label-text">Tick Lower</span>
+            </label>
+            <div className="flex items-center">
+              <button 
+                className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
+                onClick={() => {
+                  const newValue = (tickLower as number) - tickSpacing;
+                  setTickLower(newValue);
+                }}
+              >
+                -
+              </button>
+              <input 
+                type="text" 
+                placeholder="-100" 
+                className="input input-bordered w-full mx-2" 
+                value={tickLower.toString()}
+                onChange={(e) => {
+                  const re = /^[-+]?[0-9]*$/;
+                  if (e.target.value === '' || re.test(e.target.value)) {
+                    setTickLower(e.target.value === '' ? 0 : parseInt(e.target.value, 10));
+                  }
+                }} 
+              />
+              <button 
+                className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
+                onClick={() => {
+                  const newValue = (tickLower as number) + tickSpacing;
+                  setTickLower(newValue);
+                }}
+              >
+                +
+              </button>
+            </div>
+            {(tickLower as number) % tickSpacing !== 0 && (
+              <label className="label">
+                <span className="label-text-alt text-error">Tick Lower must be divisible by {tickSpacing}</span>
+              </label>
+            )}
+          </div>
+
+         
+
+
+          <div className="form-control w-full max-w-xs mb-1">
+              <label className="label">
+                <span className="label-text">Tick Upper</span>
+              </label>
+              <div className="flex items-center">
+                <button 
+                  className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
+                  onClick={() => {
+                    const newValue = (tickUpper as number) - tickSpacing;
+                    setTickUpper(newValue);
+                  }}
+                >
+                  -
+                </button>
+                <input 
+                  type="text" 
+                  placeholder="100" 
+                  className="input input-bordered w-full mx-2" 
+                  value={tickUpper.toString()}
+                  onChange={(e) => {
+                    const re = /^[-+]?[0-9]*$/;
+                    if (e.target.value === '' || re.test(e.target.value)) {
+                      setTickUpper(e.target.value === '' ? 0 : parseInt(e.target.value, 10));
+                    }
+                  }} 
+                />
+                <button 
+                  className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
+                  onClick={() => {
+                    const newValue = (tickUpper as number) + tickSpacing;
+                    setTickUpper(newValue);
+                  }}
+                >
+                  +
+                </button>
+              </div>
+              {(tickUpper as number) % tickSpacing !== 0 && (
+                <label className="label">
+                  <span className="label-text-alt text-error">Tick Upper must be divisible by {tickSpacing}</span>
+                </label>
+              )}
+          </div>
               <LiquidityChart
                 tickLower={tickLower}
                 tickUpper={tickUpper}
                 tickSpacing={tickSpacing}
                 onTickChange={handleTickChange}
               />
+
+{tickError && (
+            <div className="alert alert-error shadow-lg mt-4">
+              <div>
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{tickError}</span>
+              </div>
+            </div>
+          )}
             </div>
           </div>
         </div>
@@ -324,92 +431,7 @@ const LiquidityComponent = () => {
 
 
 
-          <div className="form-control w-full max-w-xs mb-4">
-            <label className="label">
-              <span className="label-text">Tick Lower</span>
-            </label>
-            <div className="flex items-center">
-              <button 
-                className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
-                onClick={() => {
-                  const newValue = (tickLower as number) - tickSpacing;
-                  setTickLower(newValue);
-                }}
-              >
-                -
-              </button>
-              <input 
-                type="text" 
-                placeholder="-100" 
-                className="input input-bordered w-full mx-2" 
-                value={tickLower.toString()}
-                onChange={(e) => {
-                  const re = /^[-+]?[0-9]*$/;
-                  if (e.target.value === '' || re.test(e.target.value)) {
-                    setTickLower(e.target.value === '' ? 0 : parseInt(e.target.value, 10));
-                  }
-                }} 
-              />
-              <button 
-                className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
-                onClick={() => {
-                  const newValue = (tickLower as number) + tickSpacing;
-                  setTickLower(newValue);
-                }}
-              >
-                +
-              </button>
-            </div>
-            {(tickLower as number) % tickSpacing !== 0 && (
-              <label className="label">
-                <span className="label-text-alt text-error">Tick Lower must be divisible by {tickSpacing}</span>
-              </label>
-            )}
-          </div>
-
-
-          <div className="form-control w-full max-w-xs mb-4">
-              <label className="label">
-                <span className="label-text">Tick Upper</span>
-              </label>
-              <div className="flex items-center">
-                <button 
-                  className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
-                  onClick={() => {
-                    const newValue = (tickUpper as number) - tickSpacing;
-                    setTickUpper(newValue);
-                  }}
-                >
-                  -
-                </button>
-                <input 
-                  type="text" 
-                  placeholder="100" 
-                  className="input input-bordered w-full mx-2" 
-                  value={tickUpper.toString()}
-                  onChange={(e) => {
-                    const re = /^[-+]?[0-9]*$/;
-                    if (e.target.value === '' || re.test(e.target.value)) {
-                      setTickUpper(e.target.value === '' ? 0 : parseInt(e.target.value, 10));
-                    }
-                  }} 
-                />
-                <button 
-                  className="btn btn-square btn-sm hover:scale-110 transition-transform duration-200"
-                  onClick={() => {
-                    const newValue = (tickUpper as number) + tickSpacing;
-                    setTickUpper(newValue);
-                  }}
-                >
-                  +
-                </button>
-              </div>
-              {(tickUpper as number) % tickSpacing !== 0 && (
-                <label className="label">
-                  <span className="label-text-alt text-error">Tick Upper must be divisible by {tickSpacing}</span>
-                </label>
-              )}
-          </div>
+          
 
           <div className="form-control w-full max-w-xs mb-4">
             <label className="label">
