@@ -23,8 +23,8 @@ const LiquidityComponent = () => {
   const [amount, setAmount] = useState('1');
   const [tickSpacing, setTickSpacing] = useState(60);
   const [swapFee, setSwapFee] = useState(4000);
-  const [tickLower, setTickLower] = useState<Number>(-tickSpacing);
-  const [tickUpper, setTickUpper] = useState<Number>(tickSpacing);
+  const [tickLower, setTickLower] = useState<number>(-tickSpacing);
+  const [tickUpper, setTickUpper] = useState<number>(tickSpacing);
 
   const [isApproved, setIsApproved] = useState(false);
   const [hookData, setHookData] = useState<`0x${string}`>("0x0"); // New state for custom hook data
@@ -188,9 +188,9 @@ const LiquidityComponent = () => {
   //Tick Change Handler
   const handleTickChange = (type, newTick) => {
     if (type === 'lower') {
-      setTickLower(newTick);
+      setTickLower(Math.min(newTick, tickUpper - tickSpacing));
     } else {
-      setTickUpper(newTick);
+      setTickUpper(Math.max(newTick, tickLower + tickSpacing));
     }
   };
 

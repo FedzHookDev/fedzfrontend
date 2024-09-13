@@ -27,11 +27,11 @@ const Home: NextPage = () => {
         <section className="hero bg-base-100 rounded-lg shadow-md mb-8">
           <div className="hero-content text-center  py-12">
             <div className="max-w-md">
-              <h1 className="text-5xl font-bold mb-4 text-blue-600">The Fedz Project</h1>
+              <h1 className="text-5xl font-bold mb-4 text-blue-600">The Fedz</h1>
               <p className="mb-6 text-gray-700">
-                Welcome to The Fedz – a revolutionary decentralized finance (DeFi) platform designed to redefine the stability and efficiency of stablecoins and synthetic derivatives in the blockchain ecosystem.
+                Welcome to The Fedz – The Fedz was founded to solve the persistent issue of instability in decentralized finance by offering a mechanism to mitigate bank runs. The Fedz aims to provide a resilient financial system that reduces bank-run risk while maintaining liquidity, allowing for greater trust and participation in DeFi markets.
               </p>
-              <button className="btn btn-primary bg-blue-500 hover:bg-blue-600">Get Started</button>
+              <button className="btn btn-primary bg-blue-500 hover:bg-blue-600">Start Printing</button>
             </div>
           </div>
         </section>
@@ -39,7 +39,8 @@ const Home: NextPage = () => {
         <section className="bg-base-100 rounded-lg shadow-md p-8 mb-8">
           <h2 className="text-3xl font-bold mb-4 text-center text-blue-600">Our Mission</h2>
           <p className="text-center max-w-2xl mx-auto text-gray-700">
-            Our mission is to create a robust financial mechanism that prevents bank runs, ensures liquidity, and enhances the stability of dollar derivatives with minimal capital</p>
+          Our mission is to create a robust financial mechanism that mitigates bank runs, demonstrating the system's effectiveness by stabilizing the FUSD peg to USDT through under-collateralization and minimal capital needs.
+          </p>
         </section>
 
         <section className="bg-base-100 rounded-lg shadow-md p-8 mb-8">
@@ -48,19 +49,20 @@ const Home: NextPage = () => {
             <div className="card bg-base-100 shadow-sm">
               <div className="card-body">
                 <h3 className="card-title text-blue-500">Preventing Bank Runs</h3>
-                <p className="text-gray-700">Implement mechanisms to mitigate the risk of panic withdrawals and ensure the security of users' assets.</p>
+                <p className="text-gray-700">Implement proven mechanisms to mitigate the risk of panic withdrawals and ensure the security of users' assets.</p>
               </div>
             </div>
             <div className="card bg-base-100 shadow-sm">
               <div className="card-body">
-                <h3 className="card-title text-blue-500">Enhancing Liquidity</h3>
-                <p className="text-gray-700">Creating Private Liquidity Pools prioritizing stability and accessibility for NFT holders.</p>
+                <h3 className="card-title text-blue-500">Private Liquidity Pools (PLP)</h3>
+                <p className="text-gray-700">Modified structures of an AMM designed to enable issuers to demonstrate their financial trust, offering enhanced stability within decentralized markets.</p>
               </div>
             </div>
             <div className="card bg-base-100 shadow-sm">
               <div className="card-body">
-                <h3 className="card-title text-blue-500">New Financial Model</h3>
-                <p className="text-gray-700">Utilizing blockchain technology to build a sustainable and scalable financial ecosystem that offers unique opportunities to both traditional and digital asset investors.</p>
+                <h3 className="card-title text-blue-500">FUSD</h3>
+                <p className="text-gray-700">A stablecoin backed by undercollateralized assets, designed to maintain a stable value while minimizing capital requirements, and introduced as our first financial product to demonstrate stability and mitigate bank runs within The Fedz ecosystem.
+                </p>
               </div>
             </div>
           </div>
