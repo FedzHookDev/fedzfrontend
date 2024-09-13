@@ -61,55 +61,66 @@ const LiquidityChart = ({ tickLower, tickUpper, tickSpacing, onTickChange }) => 
 
 
     const drawTickSelector = (initialTick, color, type) => {
-      let tick = initialTick;
+  let tick = initialTick;
 
-      const tickGroup = g.append("g");
+  const tickGroup = g.append("g");
 
-      const tickLine = tickGroup.append("line")
-        .attr("x1", x(tick))
-        .attr("x2", x(tick))
-        .attr("y1", 0)
-        .attr("y2", height)
-        .attr("stroke", color)
-        .attr("stroke-width", 2);
+  const tickLine = tickGroup.append("line")
+    .attr("x1", x(tick))
+    .attr("x2", x(tick))
+    .attr("y1", 0)
+    .attr("y2", height)
+    .attr("stroke", color)
+    .attr("stroke-width", 2);
 
-      const tickHandle = tickGroup.append("rect")
-        .attr("x", x(tick) - 5)
-        .attr("y", 0)
-        .attr("width", 10)
-        .attr("height", 20)
-        .attr("fill", color)
-        .style("cursor", "ew-resize");
+  const tickHandle = tickGroup.append("rect")
+    .attr("x", x(tick) - 5)
+    .attr("y", 0)
+    .attr("width", 10)
+    .attr("height", 20)
+    .attr("fill", color)
+    .style("cursor", "ew-resize");
 
-      const drag = d3.drag()
-        .on("drag", (event) => {
-          const svgNode = svg.node();
-          const svgRect = svgNode.getBoundingClientRect();
-          const mouseX = event.sourceEvent.clientX - svgRect.left - margin.left;
-          
-          let newTick = Math.round(x.invert(mouseX) / tickSpacing) * tickSpacing;
-          
-          // Ensure newTick is within the domain of x scale
-          newTick = Math.max(x.domain()[0], Math.min(x.domain()[1], newTick));
+  const drag = d3.drag()
+    .on("start", (event) => {
+      tickHandle.raise();
+    })
+    .on("drag", (event) => {
+      const svgNode = svg.node();
+      const svgRect = svgNode.getBoundingClientRect();
+      const mouseX = event.sourceEvent.clientX - svgRect.left - margin.left;
+      
+      // Move the selector to the mouse position without snapping
+      const newX = Math.max(0, Math.min(width, mouseX));
+      tickLine.attr("x1", newX).attr("x2", newX);
+      tickHandle.attr("x", newX - 5);
+    })
+    .on("end", (event) => {
+      const svgNode = svg.node();
+      const svgRect = svgNode.getBoundingClientRect();
+      const mouseX = event.sourceEvent.clientX - svgRect.left - margin.left;
+      
+      let newTick = Math.round(x.invert(mouseX) / tickSpacing) * tickSpacing;
+      // Ensure newTick is within the domain of x scale
+      newTick = Math.max(x.domain()[0], Math.min(x.domain()[1], newTick));
 
-          // Ensure tickLower is never above tickUpper
-          if (type === 'lower' && newTick >= tickUpper) {
-            newTick = tickUpper - tickSpacing;
-          } else if (type === 'upper' && newTick <= tickLower) {
-            newTick = tickLower + tickSpacing;
-          }
+      // Ensure tickLower is never above tickUpper
+      if (type === 'lower' && newTick >= tickUpper) {
+        newTick = tickUpper - tickSpacing;
+      } else if (type === 'upper' && newTick <= tickLower) {
+        newTick = tickLower + tickSpacing;
+      }
 
-          if (newTick !== tick) {
-            const newX = x(newTick);
-            tickLine.attr("x1", newX).attr("x2", newX);
-            tickHandle.attr("x", newX - 5);
-            onTickChange(type, newTick);
-            tick = newTick;
-          }
-        });
+      const finalX = x(newTick);
+      tickLine.attr("x1", finalX).attr("x2", finalX);
+      tickHandle.attr("x", finalX - 5);
+      onTickChange(type, newTick);
+      tick = newTick;
+    });
 
-      tickHandle.call(drag);
+  tickHandle.call(drag);
 };
+
 
 
 
