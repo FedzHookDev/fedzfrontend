@@ -70,7 +70,7 @@ const NftComponent = () => {
               {allNfts.map(({ owner, id }) => (
                 <div key={`${owner}-${id}`} className="carousel-item relative w-full h-96">
                   <Image 
-                    src={`/NftPictures/nft_${id}.webp`}
+                    src={`/NftPictures/nft_${id}.jpg`}
                     alt={`NFT ${id}`}
                     width={500}
                     height={500}
