@@ -95,6 +95,12 @@
             "internalType":"address",
             "name":"player",
             "type":"address"
+         },
+         {
+            "indexed":false,
+            "internalType":"uint256",
+            "name":"slots",
+            "type":"uint256"
          }
       ],
       "name":"PlayerRegistered",
@@ -114,6 +120,25 @@
       "type":"event"
    },
    {
+      "anonymous":false,
+      "inputs":[
+         {
+            "indexed":false,
+            "internalType":"uint256",
+            "name":"endTime",
+            "type":"uint256"
+         },
+         {
+            "indexed":false,
+            "internalType":"uint256",
+            "name":"roundNumber",
+            "type":"uint256"
+         }
+      ],
+      "name":"RoundEnded",
+      "type":"event"
+   },
+   {
       "inputs":[
          {
             "internalType":"address",
@@ -127,6 +152,45 @@
             "internalType":"bool",
             "name":"",
             "type":"bool"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         
+      ],
+      "name":"currentRoundNumber",
+      "outputs":[
+         {
+            "internalType":"uint256",
+            "name":"",
+            "type":"uint256"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         {
+            "internalType":"address",
+            "name":"player",
+            "type":"address"
+         }
+      ],
+      "name":"getAllActionWindows",
+      "outputs":[
+         {
+            "internalType":"uint256[]",
+            "name":"startTimes",
+            "type":"uint256[]"
+         },
+         {
+            "internalType":"uint256[]",
+            "name":"endTimes",
+            "type":"uint256[]"
          }
       ],
       "stateMutability":"view",
@@ -175,10 +239,40 @@
       "inputs":[
          
       ],
+      "name":"getRoundTimeLeft",
+      "outputs":[
+         {
+            "internalType":"uint256",
+            "name":"",
+            "type":"uint256"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         
+      ],
+      "name":"isRoundActive",
+      "outputs":[
+         {
+            "internalType":"bool",
+            "name":"",
+            "type":"bool"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
+         
+      ],
       "name":"nftContract",
       "outputs":[
          {
-            "internalType":"contract IERC721",
+            "internalType":"contract MockERC721",
             "name":"",
             "type":"address"
          }
@@ -196,21 +290,6 @@
             "internalType":"address",
             "name":"",
             "type":"address"
-         }
-      ],
-      "stateMutability":"view",
-      "type":"function"
-   },
-   {
-      "inputs":[
-         
-      ],
-      "name":"playerCount",
-      "outputs":[
-         {
-            "internalType":"uint256",
-            "name":"",
-            "type":"uint256"
          }
       ],
       "stateMutability":"view",
@@ -252,37 +331,11 @@
          },
          {
             "internalType":"uint256",
-            "name":"index",
+            "name":"slots",
             "type":"uint256"
          }
       ],
       "stateMutability":"view",
-      "type":"function"
-   },
-   {
-      "inputs":[
-         
-      ],
-      "name":"registerPlayer",
-      "outputs":[
-         
-      ],
-      "stateMutability":"nonpayable",
-      "type":"function"
-   },
-   {
-      "inputs":[
-         {
-            "internalType":"address",
-            "name":"player",
-            "type":"address"
-         }
-      ],
-      "name":"registerPlayer",
-      "outputs":[
-         
-      ],
-      "stateMutability":"nonpayable",
       "type":"function"
    },
    {
@@ -399,6 +452,21 @@
    },
    {
       "inputs":[
+         
+      ],
+      "name":"totalSlots",
+      "outputs":[
+         {
+            "internalType":"uint256",
+            "name":"",
+            "type":"uint256"
+         }
+      ],
+      "stateMutability":"view",
+      "type":"function"
+   },
+   {
+      "inputs":[
          {
             "internalType":"address",
             "name":"newOwner",
@@ -431,7 +499,7 @@
       "inputs":[
          
       ],
-      "name":"unregisterPlayer",
+      "name":"updatePlayerSlots",
       "outputs":[
          
       ],
