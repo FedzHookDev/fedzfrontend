@@ -82,14 +82,6 @@
    {
       "anonymous":false,
       "inputs":[
-         
-      ],
-      "name":"PlayerOrderShuffled",
-      "type":"event"
-   },
-   {
-      "anonymous":false,
-      "inputs":[
          {
             "indexed":false,
             "internalType":"address",
@@ -136,6 +128,14 @@
          }
       ],
       "name":"RoundEnded",
+      "type":"event"
+   },
+   {
+      "anonymous":false,
+      "inputs":[
+         
+      ],
+      "name":"SlotsShuffled",
       "type":"event"
    },
    {
