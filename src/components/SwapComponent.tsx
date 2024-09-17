@@ -250,11 +250,12 @@ useEffect(() => {
     
     <div className="flex justify-center  min-h-screen">
         <div className="flex flex-col gap-4 mr-6">
-          <div className="card w-full bg-base-100 shadow-xl">
+          {address && (<div className="card w-full bg-base-100 shadow-xl">
             <div className="card-body">
-              <TimeSlotSystem />
+              <TimeSlotSystem address={address}/>
             </div>
-          </div>
+          </div>)}
+          
           <div className="card w-full bg-base-100 shadow-xl">
             <div className="card-body">
               <PoolKeyHashDisplay poolKeyHash={poolKeyHash} />

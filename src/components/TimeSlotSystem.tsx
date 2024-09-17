@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 import { TimeSlotSystemAddress } from '../contractAddress'
 import TimeSlotSystemAbi from '../abi/TimeSlotSystem_abi.json'
 
-export default function ActionWindow() {
-  const { address, isConnected } = useAccount()
+export default function ActionWindow({address} : {address: `0x${string}`}) {
+  const { isConnected } = useAccount()
   const [timeSlots, setTimeSlots] = useState<{ start: Date; end: Date }[]>([])
   const [currentSlot, setCurrentSlot] = useState<{ start: Date; end: Date } | null>(null)
   const [remainingTime, setRemainingTime] = useState<{days: number, hours: number, minutes: number, seconds: number} | null>(null)
@@ -87,7 +87,7 @@ export default function ActionWindow() {
   return (
     <div className="card flex bg-base-300 shadow-xl">
       <div className="card-body">
-      <h2 className="card-title">Your Action Windows</h2>
+      <h2 className="card-title justify-center">Action Windows</h2>
         {timeSlots.length > 0 ? (
           <div>
             <div className="overflow-x-auto">
