@@ -11,7 +11,7 @@ import TimeSlotSystemAbi from '../abi/TimeSlotSystem_abi.json';
 import PoolKeyHashDisplay from './PoolKeyHash';
 import TimeSlotSystem from './TimeSlotSystem';
 import LiquidityChart from './LiquidityChart';
-
+import RoundInfos from './RoundInfos';
 
 
 
@@ -327,6 +327,11 @@ const LiquidityComponent = () => {
               </div>
             </div>
           )}
+            </div>
+          </div>
+          <div className="card w-full bg-base-100 shadow-xl">
+            <div className="card-body">
+              <RoundInfos />
             </div>
           </div>
           <div className="card w-full bg-base-100 shadow-xl">

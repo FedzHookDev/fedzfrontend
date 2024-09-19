@@ -11,6 +11,7 @@ import {MockERC721Address} from '../contractAddress';
 import TimeSlotSystemAbi from '../abi/TimeSlotSystem_abi.json';
 import PoolKeyHashDisplay from './PoolKeyHash';
 import TimeSlotSystem from './TimeSlotSystem';
+import RoundInfos from './RoundInfos';
 
 
 const SwapComponent = () => {
@@ -255,6 +256,12 @@ useEffect(() => {
               <TimeSlotSystem address={address}/>
             </div>
           </div>)}
+
+          <div className="card w-full bg-base-100 shadow-xl">
+            <div className="card-body">
+              <RoundInfos />
+            </div>
+          </div>
           
           <div className="card w-full bg-base-100 shadow-xl">
             <div className="card-body">

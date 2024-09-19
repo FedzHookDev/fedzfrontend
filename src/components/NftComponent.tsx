@@ -5,6 +5,7 @@ import MockERC721Abi from '../abi/MockERC721_abi.json';
 import Image from 'next/image';
 import { Abi } from 'viem';
 import TimeSlotSystem from './TimeSlotSystem'; // Import the TimeSlotSystem component
+import RoundInfos from './RoundInfos';
 
 type Address = `0x${string}`;
 
@@ -125,6 +126,7 @@ const handleNftClick = (nft: NFT) => {
               <h3 className="card-title text-lg font-bold">Selected NFT: #{selectedNft.id}</h3>
               <h2 className="card-title text-md font-bold text-white mb-8">Owner: {selectedNft.owner === address ? 'You' : selectedNft.owner}</h2>
               <TimeSlotSystem address={selectedNft.owner as `0x${string}`} />
+              <RoundInfos />
             </div>
           )}
     </div>
