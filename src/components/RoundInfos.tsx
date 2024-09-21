@@ -84,47 +84,47 @@ const RoundInfos: React.FC = () => {
   return (
     <div className="card w-full bg-base-300 shadow-xl">
       <div className="card-body">
-        <h2 className="card-title">Round Information</h2>
+        <h2 className="card-title justify-center">Round Information</h2>
         <div className="stats stats-vertical shadow">
           <div className="stat">
             <div className="stat-title">Current Round</div>
-            <div className="stat-value">{!currentRoundNumber?.error ? formatUnits(currentRoundNumber.result, 0) : 'N/A'}</div>
+            <div className="stat-value text-3xl">{!currentRoundNumber?.error ? formatUnits(currentRoundNumber.result, 0) : 'N/A'}</div>
           </div>
           <div className="stat">
             <div className="stat-title">Time Left</div>
             <div className="stat-value">
-            <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
-                <div className="flex flex-col">
-                  <span className="countdown font-mono text-5xl">
+           <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
+                <div className="flex flex-row text-3xl items-center">
+                  <span className="countdown font-mono">
                     <span style={{"--value": timeLeft.hours}}></span>
                   </span>
-                  hours
-                </div>
-                <div className="flex flex-col">
-                  <span className="countdown font-mono text-5xl">
+                  <span className="ml-2 text-2xl">Hours</span>
+                  
+                  <span className="countdown font-mono ml-4">
                     <span style={{"--value": timeLeft.minutes}}></span>
                   </span>
-                  min
-                </div>
-                <div className="flex flex-col">
-                  <span className="countdown font-mono text-5xl">
+                  <span className="ml-2 text-2xl">Min</span>
+                  
+                  {/* Drop seconds for now 
+                  <span className="countdown font-mono ml-4">
                     <span style={{"--value": timeLeft.seconds}}></span>
                   </span>
-                  sec
+                  <span className="ml-2 text-2xl">sec</span>
+                  */}
                 </div>
-            </div>
+              </div>
             </div>
           </div>
           <div className="stat">
             <div className="stat-title">Round Start Time</div>
-            <div className="stat-value">{!roundStartTime?.error ? new Date(Number(roundStartTime.result) * 1000).toLocaleString() : 'N/A'}</div>
+            <div className="stat-value text-3xl">{!roundStartTime?.error ? new Date(Number(roundStartTime.result) * 1000).toLocaleString() : 'N/A'}</div>
           </div>
           <div className="stat">
             <div className="stat-title">Round Duration</div>
-            <div className="stat-value">
-                {!roundDuration?.error 
-                ? formatTime(Number(formatUnits(roundDuration.result, 0)))
-                : 'N/A'}
+            <div className="stat-value text-3xl">
+            {!roundDuration?.error 
+              ? `${Math.floor(Number(formatUnits(roundDuration.result, 0)) / 3600)}h`
+              : 'N/A'}
             </div>
           </div>
           <div className="stat">

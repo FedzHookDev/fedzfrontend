@@ -3,14 +3,16 @@ import * as d3 from 'd3';
 
 const LiquidityChart = ({ tickLower, tickUpper, tickSpacing, onTickChange }) => {
   const svgRef = useRef();
-  const [dimensions, setDimensions] = useState({ width: 800, height: 400 });
+  const containerRef = useRef();
+
+  const [dimensions, setDimensions] = useState({ width: 800, height: 300 });
   const [zoomLevel, setZoomLevel] = useState(1);
 
 
   useEffect(() => {
     const updateDimensions = () => {
       const width = svgRef.current.clientWidth;
-      setDimensions({ width, height: width / 2 });
+      setDimensions({ width, height: width / 2.4 });
     };
 
     window.addEventListener('resize', updateDimensions);
@@ -20,6 +22,24 @@ const LiquidityChart = ({ tickLower, tickUpper, tickSpacing, onTickChange }) => 
   }, []);
 
   useEffect(() => {
+    const resizeObserver = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        setDimensions({ width, height });
+      }
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (dimensions.width === 0 || dimensions.height === 0) return;
     if (!dimensions.width) return;
 
   const svg = d3.select(svgRef.current);
@@ -147,8 +167,8 @@ drawTickSelector(tickUpper, "green", 'upper');
   }, [dimensions, tickLower, tickUpper, tickSpacing, onTickChange]);
 
   return (
-    <div className="w-full">
-      <svg ref={svgRef} width="100%" height={dimensions.height}></svg>
+    <div ref={containerRef} className="w-full card">
+        <svg ref={svgRef} width="100%" height={dimensions.height} className='card-body flex flex-col'></svg>
     </div>
   );
 };
