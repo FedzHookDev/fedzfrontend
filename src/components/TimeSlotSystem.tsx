@@ -121,7 +121,7 @@ export default function ActionWindow({address} : {address: `0x${string}`}) {
             </div>
 
             {currentSlot && remainingTime && (
-              <div>
+              <div className='flex flex-col items-center mt-4'>
                 <h2 className="card-title">Current Action Window</h2>
                 <div className="grid grid-flow-col gap-4 text-center auto-cols-max pt-4">
                   <div className={`flex flex-col p-2 ${getTimerColor()} rounded-box text-white`}>
