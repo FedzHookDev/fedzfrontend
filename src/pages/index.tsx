@@ -105,7 +105,7 @@ const Home: NextPage = () => {
                 </tr>
                 <tr>
                   <td className="py-2 px-4">Description</td>
-                  <td className="py-2 px-4">A template for writing Uniswap v4 Hooks, demonstrating beforeSwap() and afterSwap() hooks in Counter.sol</td>
+                  <td className="py-2 px-4">A Uniswap v4 Hook that implements a gamifiex experienced for Swappers and LPs, with NFT restricted access and Turn Based Logic for the pool actions.</td>
                 </tr>
               </tbody>
             </table>
