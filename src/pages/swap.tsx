@@ -19,7 +19,7 @@ const Swap = () => {
         {isConnected ? (
           <SwapComponent />
         ) : (
-          <div className="text-center p-8 bg-white rounded-lg shadow-md">
+          <div className="text-center p-8 bg-base-100 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-4">Wallet Not Connected</h2>
             <p className="text-gray-600">
               Please connect your wallet to access the swap feature.

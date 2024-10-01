@@ -111,7 +111,7 @@ export default function ActionWindow({address} : {address: `0x${string}`}) {
                           <span className="badge badge-primary">Active</span> : 
                           new Date() < slot.start ? 
                             <span className="badge badge-secondary">Upcoming</span> : 
-                            <span className="badge badge-ghost">Passed</span>
+                            <span className="badge badge-ghost">Ended</span>
                         }
                       </td>
                     </tr>

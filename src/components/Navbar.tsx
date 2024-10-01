@@ -24,6 +24,9 @@ const Navbar = () => {
           <li>
             <Link href="/nft" className="btn btn-base-100 text-lg normal-case hover:scale-110 transition-transform duration-200">NFTs</Link>
           </li>
+          <li>
+            <Link href="/players" className="btn btn-base-100 text-lg normal-case hover:scale-110 transition-transform duration-200">Players</Link>
+          </li>
         </ul>
       </div>
       <div className="navbar-end">
